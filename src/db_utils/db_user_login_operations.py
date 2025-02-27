@@ -54,5 +54,3 @@ def search_users(**kwargs):
             return cursor.fetchall()
     finally:
         connection.close()
-
-

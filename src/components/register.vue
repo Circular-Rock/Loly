@@ -9,6 +9,8 @@
         <button @click="login" class="login-button">登录</button>
       </div>
       <p v-if="passwordMismatch" class="error-message">两次输入的密码不一致</p>
+      <p v-if="emptyFields" class="error-message">用户名和密码不能为空</p>
+      <p v-if="serverMessage" class="server-message">{{ serverMessage }}</p>
     </div>
     <div class="image-box">
       <img src="@/assets/loli.jpg" alt="Loli Image" class="loli-image" />
@@ -16,7 +18,10 @@
   </div>
 </template>
 
+
 <script>
+import axios from 'axios';
+
 export default {
   name: 'UserRegister',
   data() {
@@ -24,19 +29,40 @@ export default {
       username: '',
       password: '',
       confirmPassword: '',
-      passwordMismatch: false
+      passwordMismatch: false,
+      emptyFields: false,
+      serverMessage: ''
     };
   },
   methods: {
     register() {
-      if (this.password !== this.confirmPassword) {
-        this.passwordMismatch = true;
+      if (!this.username || !this.password) {
+        this.emptyFields = true;
+        this.serverMessage = '';
         return;
       }
-      // 处理注册逻辑
-      console.log('用户名:', this.username);
-      console.log('密码:', this.password);
+      if (this.password !== this.confirmPassword) {
+        this.passwordMismatch = true;
+        this.emptyFields = false;
+        this.serverMessage = '';
+        return;
+      }
       this.passwordMismatch = false;
+      this.emptyFields = false;
+
+      // 发送注册信息到后端
+      axios.post('http://localhost:5000/register', {
+        username: this.username,
+        password: this.password
+      })
+      .then(response => {
+        this.serverMessage = response.data.message;
+        console.log('注册成功:', response.data);
+      })
+      .catch(error => {
+        this.serverMessage = error.response.data.message;
+        console.error('注册失败:', error);
+      });
     },
     login() {
       // 处理登录逻辑
@@ -46,7 +72,17 @@ export default {
 }
 </script>
 
+
 <style scoped>
+.server-message {
+  color: green;
+  margin-top: 10px;
+}
+
+.server-message.error {
+  color: red;
+}
+
 .register-container {
   display: flex;
   justify-content: space-between;

@@ -11,24 +11,47 @@
         <button @click="login" class="login-button">登录</button>
         <button @click="register" class="register-button">注册</button>
       </div>
+      <p v-if="serverMessage" :class="['server-message', serverMessageType]">{{ serverMessage }}</p>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'UserLogin',
   data() {
     return {
       username: '',
-      password: ''
+      password: '',
+      serverMessage: '',
+      serverMessageType: ''
     };
   },
   methods: {
     login() {
-      // 处理登录逻辑
-      console.log('用户名:', this.username);
-      console.log('密码:', this.password);
+      if (!this.username || !this.password) {
+        this.serverMessage = '用户名和密码不能为空';
+        this.serverMessageType = 'error';
+        return;
+      }
+
+      // 发送登录信息到后端
+      axios.post('http://localhost:5000/login', {
+        username: this.username,
+        password: this.password
+      })
+      .then(response => {
+        this.serverMessage = response.data.message;
+        this.serverMessageType = response.data.status === 'success' ? 'success' : 'error';
+        console.log('登录成功:', response.data);
+      })
+      .catch(error => {
+        this.serverMessage = error.response.data.message;
+        this.serverMessageType = 'error';
+        console.error('登录失败:', error);
+      });
     },
     register() {
       // 处理注册逻辑
@@ -39,6 +62,18 @@ export default {
 </script>
 
 <style scoped>
+.server-message {
+  margin-top: 10px;
+}
+
+.server-message.success {
+  color: green;
+}
+
+.server-message.error {
+  color: red;
+}
+
 .login-container {
   display: flex;
   justify-content: space-between;
@@ -118,5 +153,10 @@ export default {
 
 .register-button:hover {
   background-color: #007bb5;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
 }
 </style>
