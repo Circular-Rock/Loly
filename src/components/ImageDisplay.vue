@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import axios from 'axios'; // 引入 axios
+
 export default {
   data() {
     return {
@@ -37,7 +39,20 @@ export default {
       option.action();
     },
     handleSubmit() {
-      alert('提交按钮被点击，输入文本为: ' + this.inputText);
+      this.sendTextToBackend(this.inputText);
+    },
+    sendTextToBackend(text) {
+      axios.post('http://localhost:5000/receive_text', { text: text })
+        .then(response => {
+          console.log('Backend response:', response.data);
+        })
+        .catch(error => {
+          console.error('Error sending text to backend:', error);
+        });
+    },
+    process_text(text) {
+      // 这里可以添加实际的后端处理逻辑
+      console.log('Sending text to backend:', text);
     }
   }
 };
