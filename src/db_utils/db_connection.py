@@ -1,5 +1,5 @@
 import pymysql
-from .db_config import DB_CONFIG  # 导入配置信息
+from src.db_utils.db_config import DB_CONFIG  # 导入配置信息
 
 def get_db_connection():
     """
