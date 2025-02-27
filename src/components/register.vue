@@ -8,7 +8,7 @@
         <button @click="register" class="register-button">注册</button>
         <button @click="login" class="login-button">登录</button>
       </div>
-      <p v-if="passwordMismatch" class="error-message">密码不匹配</p>
+      <p v-if="passwordMismatch" class="error-message">两次输入的密码不一致</p>
     </div>
     <div class="image-box">
       <img src="@/assets/loli.jpg" alt="Loli Image" class="loli-image" />
