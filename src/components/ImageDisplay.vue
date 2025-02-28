@@ -33,25 +33,25 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
-import {voice_generated_URL} from '@/router/config.js'; // 引入服务地址配置
+import {copywriting_generated_URL} from '@/router/config.js'; // 引入服务地址配置
 
 export default {
   data() {
     return {
       options: [
         {
-          label: 'Option 1', action: () => {
+          label: '提交商品信息', action: () => {
             this.imageSrc = require('@/assets/logo.png');
           }
         },
         {
-          label: 'Option 2', action: () => {
+          label: '提交文案信息', action: () => {
             alert('Option 2 clicked');
           }
         },
         {
-          label: 'Option 3', action: () => {
-            alert('Option 3 clicked');
+          label: '提交声音信息', action: () => {
+            this.sendAudioToBackend();
           }
         }
       ],
@@ -65,39 +65,48 @@ export default {
       option.action();
     },
     handleSubmit() {
-      // 清空之前的音频文件列表
       this.audioFiles = [];
       const payload = {
-        text: this.inputText,
-        prompt: "",
-        custom_voice: 0,
-        voice: "2222",
-        temperature: 0.3,
-        top_p: 0.7,
-        top_k: 20,
-        skip_refine: 0,
-        speed: 5,
-        text_seed: 42,
-        refine_max_new_token: 384,
-        infer_max_new_token: 2048,
-        wav: 0,
-        is_stream: 0
+        text: this.inputText
       };
       this.sendTextToBackend(payload);
     },
     sendTextToBackend(payload) {
       console.log(payload);
-      console.log(voice_generated_URL);
-      axios.post(voice_generated_URL, payload) // 使用配置文件中的服务地址
+      console.log(copywriting_generated_URL);
+      axios.post(copywriting_generated_URL, payload) // 使用配置文件中的服务地址
           .then(response => {
             console.log('Backend response:', response.data);
-            if (response.data.code === 0) {
-              this.audioFiles = response.data.audio_files;
-            }
           })
           .catch(error => {
             console.error('Error sending text to backend:', error);
           });
+    },
+    sendAudioToBackend() {
+      const audioUrl = 'http://192.168.228.242:8080/live2d';
+      const audioPath = require('@/assets/1.mp3');
+      const imagePath = require('@/assets/wrs.jpg');
+
+      Promise.all([
+        fetch(audioPath).then(response => response.blob()),
+        fetch(imagePath).then(response => response.blob())
+      ]).then(([audioBlob, imageBlob]) => {
+        const formData = new FormData();
+        formData.append('audio', new File([audioBlob], '1.mp3', {type: 'audio/mpeg'}));
+        formData.append('image', new File([imageBlob], 'wrs.jpg', {type: 'image/jpeg'}));
+
+        axios.post(audioUrl, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then(() => {
+          console.log('Audio and image sent successfully:');
+        }).catch(error => {
+          console.error('Error sending audio and image:', error);
+        });
+      }).catch(error => {
+        console.error('Error fetching audio or image file:', error);
+      });
     }
   }
 };
