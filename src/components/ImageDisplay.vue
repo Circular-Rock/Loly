@@ -12,8 +12,11 @@
       </div>
     </div>
     <div class="main-content">
-      <div class="image-container">
-        <img :src="imageSrc" alt="Display Image" class="display-image"/>
+      <div class="video-container">
+        <video v-if="videoSrc" :src="videoSrc" controls class="display-video">
+          Your browser does not support the video tag.
+        </video>
+        <img v-else :src="imageSrc" alt="Display Image" class="display-image"/>
       </div>
       <div class="audio-player-container">
         <div v-if="audioFiles.length > 0">
@@ -33,7 +36,10 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
-import {copywriting_generated_URL} from '@/router/config.js'; // 引入服务地址配置
+import {voice_generated_URL} from '@/router/config.js';
+import {copywriting_generated_URL} from '@/router/config.js';
+import {video_generated_URL} from '@/router/config.js';
+import {video_play_URL} from '@/router/config.js';
 
 export default {
   data() {
@@ -41,12 +47,12 @@ export default {
       options: [
         {
           label: '提交商品信息', action: () => {
-            this.imageSrc = require('@/assets/logo.png');
+            this.sendTextToBackend({ text: this.inputText });
           }
         },
         {
           label: '提交文案信息', action: () => {
-            alert('Option 2 clicked');
+            this.sendVoiceToBackend();
           }
         },
         {
@@ -56,6 +62,7 @@ export default {
         }
       ],
       imageSrc: require('@/assets/logo.png'),
+      videoSrc: null,
       inputText: '',
       audioFiles: []
     };
@@ -77,13 +84,44 @@ export default {
       axios.post(copywriting_generated_URL, payload) // 使用配置文件中的服务地址
           .then(response => {
             console.log('Backend response:', response.data);
+            this.inputText = response.data.response_content; // 将返回的文案显示在文本框中
           })
           .catch(error => {
             console.error('Error sending text to backend:', error);
           });
     },
+    sendVoiceToBackend() {
+      const toEndFile = {
+        text: this.inputText,
+        custom_voice: 0,
+        prompt: "",
+        voice: "2222",
+        temperature: 0.3,
+        top_p: 0.7,
+        top_k: 20,
+        skip_refine: 0,
+        speed: 5,
+        text_seed: 42,
+        refine_max_new_token: 384,
+        infer_max_new_token: 2048,
+        wav: 0,
+        is_stream: 0
+      };
+      
+      axios.post(voice_generated_URL, toEndFile)
+        .then(response => {
+          console.log('Backend response:', response.data);
+          if (response.data.code === 0) {
+            this.audioFiles = response.data.audio_files;
+          } else {
+            console.error('Error in backend response:', response.data.msg);
+          }
+        })
+        .catch(error => {
+          console.error('Error sending voice to backend:', error);
+        });
+    },
     sendAudioToBackend() {
-      const audioUrl = 'http://192.168.228.242:8080/live2d';
       const audioPath = require('@/assets/1.mp3');
       const imagePath = require('@/assets/wrs.jpg');
 
@@ -95,12 +133,16 @@ export default {
         formData.append('audio', new File([audioBlob], '1.mp3', {type: 'audio/mpeg'}));
         formData.append('image', new File([imageBlob], 'wrs.jpg', {type: 'image/jpeg'}));
 
-        axios.post(audioUrl, formData, {
+        axios.post(video_generated_URL, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
-        }).then(() => {
-          console.log('Audio and image sent successfully:');
+        }).then(response => {
+          console.log('Audio and image sent successfully:', response);
+          this.videoSrc = video_play_URL + response.data['url'];
+          console.log(response);
+          console.log(video_play_URL);
+          console.log(this.videoSrc)
         }).catch(error => {
           console.error('Error sending audio and image:', error);
         });
@@ -194,14 +236,19 @@ export default {
   padding: 20px;
 }
 
-.image-container {
-  flex: 1; /* 使图片容器占据剩余空间 */
-  width: 100%; /* 使图片容器在水平方向上也占满可用空间 */
+.video-container {
+  flex: 1; /* 使视频容器占据剩余空间 */
+  width: 60%; /* 使视频容器在水平方向上也占满可用空间 */
   display: flex;
   justify-content: center;
   align-items: center;
   border: 2px solid #ccc; /* 添加边框 */
   border-radius: 5px; /* 可选：添加圆角 */
+}
+
+.display-video {
+  max-width: 50%;
+  max-height: 50%;
 }
 
 .display-image {
