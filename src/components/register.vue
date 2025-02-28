@@ -18,9 +18,9 @@
   </div>
 </template>
 
-
 <script>
 import axios from 'axios';
+import { useRouter } from 'vue-router'; // 引入 useRouter
 
 export default {
   name: 'UserRegister',
@@ -33,6 +33,10 @@ export default {
       emptyFields: false,
       serverMessage: ''
     };
+  },
+  setup() {
+    const router = useRouter(); // 初始化 router
+    return { router };
   },
   methods: {
     register() {
@@ -57,6 +61,9 @@ export default {
       })
       .then(response => {
         this.serverMessage = response.data.message;
+        if (response.data.status === 'success') {
+          this.router.push('/login'); // 修改跳转路径到 login.vue
+        }
         console.log('注册成功:', response.data);
       })
       .catch(error => {
@@ -65,13 +72,11 @@ export default {
       });
     },
     login() {
-      // 处理登录逻辑
       console.log('Login button clicked');
     }
   }
 }
 </script>
-
 
 <style scoped>
 .server-message {
