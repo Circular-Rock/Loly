@@ -21,6 +21,7 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
+import { voice_generated_URL } from '@/router/config.js'; // 引入服务地址配置
 
 export default {
   data() {
@@ -71,7 +72,8 @@ export default {
     },
     sendTextToBackend(payload) {
       console.log(payload);
-      axios.post('http://192.168.228.43:9966/tts', payload)
+      console.log(voice_generated_URL);
+      axios.post(voice_generated_URL, payload) // 使用配置文件中的服务地址
           .then(response => {
             console.log('Backend response:', response.data);
           })

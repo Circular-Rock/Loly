@@ -1,0 +1,1 @@
+export const voice_generated_URL = 'http://192.168.228.43:9966/tts';
