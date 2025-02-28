@@ -13,7 +13,7 @@
     </div>
     <div class="main-content">
       <div class="image-container">
-        <img :src="imageSrc" alt="Display Image" class="display-image" />
+        <img :src="imageSrc" alt="Display Image" class="display-image"/>
       </div>
     </div>
   </div>
@@ -26,9 +26,21 @@ export default {
   data() {
     return {
       options: [
-        { label: 'Option 1', action: () => { this.imageSrc = require('@/assets/logo.png'); } },
-        { label: 'Option 2', action: () => { alert('Option 2 clicked'); } },
-        { label: 'Option 3', action: () => { alert('Option 3 clicked'); } }
+        {
+          label: 'Option 1', action: () => {
+            this.imageSrc = require('@/assets/logo.png');
+          }
+        },
+        {
+          label: 'Option 2', action: () => {
+            alert('Option 2 clicked');
+          }
+        },
+        {
+          label: 'Option 3', action: () => {
+            alert('Option 3 clicked');
+          }
+        }
       ],
       imageSrc: require('@/assets/logo.png'),
       inputText: ''
@@ -39,20 +51,33 @@ export default {
       option.action();
     },
     handleSubmit() {
-      this.sendTextToBackend(this.inputText);
+      const payload = {
+        text: this.inputText,
+        prompt:"",
+        custom_voice: 0,
+        voice: "2222",
+        temperature: 0.3,
+        top_p: 0.7,
+        top_k: 20,
+        skip_refine: 0,
+        speed: 5,
+        text_seed: 42,
+        refine_max_new_token: 384,
+        infer_max_new_token: 2048,
+        wav: 0,
+        is_stream: 0
+      };
+      this.sendTextToBackend(payload);
     },
-    sendTextToBackend(text) {
-      axios.post('http://localhost:5000/receive_text', { text: text })
-        .then(response => {
-          console.log('Backend response:', response.data);
-        })
-        .catch(error => {
-          console.error('Error sending text to backend:', error);
-        });
-    },
-    process_text(text) {
-      // 这里可以添加实际的后端处理逻辑
-      console.log('Sending text to backend:', text);
+    sendTextToBackend(payload) {
+      console.log(payload);
+      axios.post('http://192.168.228.43:9966/tts', payload)
+          .then(response => {
+            console.log('Backend response:', response.data);
+          })
+          .catch(error => {
+            console.error('Error sending text to backend:', error);
+          });
     }
   }
 };

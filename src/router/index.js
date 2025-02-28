@@ -2,16 +2,22 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Register from '../components/register.vue';
 import Login from '../components/login.vue';
 import NotFound from "../components/NotFound.vue";
+import ImageDisplay from "../components/ImageDisplay.vue";
 
    const routes = [
      {
        path: '/',
-       redirect: '/register'
+       redirect: '/ImageDisplay'
      },
      {
        path: '/register',
        name: 'Register',
        component: Register
+     },
+     {
+       path: '/ImageDisplay',
+       name: 'ImageDisplay',
+       component: ImageDisplay
      },
      {
        path: '/login',
