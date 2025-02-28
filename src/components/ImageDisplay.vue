@@ -15,13 +15,25 @@
       <div class="image-container">
         <img :src="imageSrc" alt="Display Image" class="display-image"/>
       </div>
+      <div class="audio-player-container">
+        <div v-if="audioFiles.length > 0">
+          <audio v-for="(audio, index) in audioFiles" :key="index" controls>
+            <source :src="audio.url" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+        <div v-else>
+          <!-- 占位内容，当没有音频文件时显示 -->
+          <p>暂无音频文件</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'; // 引入 axios
-import { voice_generated_URL } from '@/router/config.js'; // 引入服务地址配置
+import {voice_generated_URL} from '@/router/config.js'; // 引入服务地址配置
 
 export default {
   data() {
@@ -44,7 +56,8 @@ export default {
         }
       ],
       imageSrc: require('@/assets/logo.png'),
-      inputText: ''
+      inputText: '',
+      audioFiles: []
     };
   },
   methods: {
@@ -52,9 +65,11 @@ export default {
       option.action();
     },
     handleSubmit() {
+      // 清空之前的音频文件列表
+      this.audioFiles = [];
       const payload = {
         text: this.inputText,
-        prompt:"",
+        prompt: "",
         custom_voice: 0,
         voice: "2222",
         temperature: 0.3,
@@ -76,6 +91,9 @@ export default {
       axios.post(voice_generated_URL, payload) // 使用配置文件中的服务地址
           .then(response => {
             console.log('Backend response:', response.data);
+            if (response.data.code === 0) {
+              this.audioFiles = response.data.audio_files;
+            }
           })
           .catch(error => {
             console.error('Error sending text to backend:', error);
@@ -180,5 +198,9 @@ export default {
 .display-image {
   max-width: 100%;
   max-height: 100%;
+}
+
+.audio-player-container {
+  margin-top: 20px;
 }
 </style>
