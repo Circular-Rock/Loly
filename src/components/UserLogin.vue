@@ -1,12 +1,12 @@
 <template>
   <div class="login-container">
     <div class="image-box">
-      <img src="@/assets/loli.jpg" alt="Loli Image" class="loli-image" />
+      <img src="@/assets/loli.jpg" alt="Loli Image" class="loli-image"/>
     </div>
     <div class="login-box">
       <h2 class="project-title">虚拟数字主播</h2>
-      <input v-model="username" type="text" placeholder="用户名" class="login-input" />
-      <input v-model="password" type="password" placeholder="密码" class="login-input" />
+      <input v-model="username" type="text" placeholder="用户名" class="login-input"/>
+      <input v-model="password" type="password" placeholder="密码" class="login-input"/>
       <div class="button-container">
         <button @click="login" class="login-button">登录</button>
         <button @click="register" class="register-button">注册</button>
@@ -32,7 +32,7 @@ export default {
   },
   setup() {
     const router = useRouter(); // 初始化 router
-    return { router };
+    return {router};
   },
   methods: {
     login() {
@@ -46,19 +46,19 @@ export default {
       axios.post('http://localhost:5000/login', {
         username: this.username,
         password: this.password
-      })
-      .then(response => {
-        this.serverMessage = response.data.message;
-        console.log(this.serverMessage);
-        this.router.push('/ImageDisplay');
-        console.log('注册成功:', response.data);
-      })
-      .catch(error => {
-        console.error('登录失败:', error);
-      });
+      }).then(response => {
+          this.serverMessage = response.data.message;
+          this.serverMessageType = response.data.status === 'success' ? 'success' : 'error';
+          if (response.data.status === 'success') {
+            this.router.push('/ImageDisplay');
+          }
+        })
+        .catch(error => {
+          console.error('登录失败:', error);
+        });
     },
     register() {
-      this.router.push('/register');
+      this.router.push('/UserRegister');
       console.log('Register button clicked');
     }
   }

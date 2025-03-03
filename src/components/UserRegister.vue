@@ -62,7 +62,7 @@ export default {
       .then(response => {
         this.serverMessage = response.data.message;
         if (response.data.status === 'success') {
-          this.router.push('/login'); // 修改跳转路径到 login.vue
+          this.router.push('/UserLogin'); // 修改跳转路径到 UserLogin.vue
         }
         console.log('注册成功:', response.data);
       })
@@ -72,6 +72,7 @@ export default {
       });
     },
     login() {
+      this.router.push('/UserRegister');
       console.log('Login button clicked');
     }
   }

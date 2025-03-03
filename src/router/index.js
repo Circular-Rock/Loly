@@ -1,18 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Register from '../components/register.vue';
-import Login from '../components/login.vue';
+import UserRegister from '../components/UserRegister.vue';
+import UserLogin from '../components/UserLogin.vue';
 import NotFound from "../components/NotFound.vue";
 import ImageDisplay from "../components/ImageDisplay.vue";
+import UserConsole from "../components/UserConsole.vue";
 
    const routes = [
      {
        path: '/',
-       redirect: '/login'
+       redirect: '/UserConsole'
      },
      {
        path: '/register',
-       name: 'Register',
-       component: Register
+       name: 'UserRegister',
+       component: UserRegister
      },
      {
        path: '/ImageDisplay',
@@ -21,8 +22,13 @@ import ImageDisplay from "../components/ImageDisplay.vue";
      },
      {
        path: '/login',
-       name: 'Login',
-       component: Login
+       name: 'UserRegister',
+       component: UserLogin
+     },
+     {
+       path: '/console',
+       name: 'UserConsole',
+       component: UserConsole
      },
      {
        path: '/:pathMatch(.*)*',
