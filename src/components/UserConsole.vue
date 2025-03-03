@@ -51,6 +51,23 @@
         </div>
       </div>
     </div>
+    <div class="right-panel"> <!-- 新增的右侧容器 -->
+      <div class="right-panel-wrapper"> <!-- 添加的包裹容器 -->
+        <div class="image-container top large-image"> <!-- 大的图片显示框 -->
+          <img :src="imageUrl" alt="Image 1" class="image-display" />
+        </div>
+        <div class="bottom-container"> <!-- 下半部分容器 -->
+          <div class="split-container"> <!-- 分割容器 -->
+            <div class="image-container bottom small-image"> <!-- 小的图片显示框2 -->
+              <img :src="imageUrl" alt="Image 2" class="image-display" />
+            </div>
+            <div class="text-container"> <!-- 文本输入框容器 -->
+              <textarea v-model="textInput" placeholder="输入文本"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -91,7 +108,7 @@ export default {
 <style scoped>
 .console-container {
   display: flex;
-  flex-direction: column; /* 修改为列布局 */
+  flex-direction: row; /* 修改为行布局 */
   height: 100vh; /* 使容器占满整个视口高度 */
 }
 
@@ -101,6 +118,24 @@ export default {
   display: flex;
   flex-direction: column; /* 使左侧容器竖直排列 */
   flex: 1; /* 使左侧容器占满整个左侧一列 */
+}
+
+.right-panel {
+  width: 70%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column; /* 使右侧容器竖直排列 */
+  flex: 1; /* 使右侧容器占满整个右侧一列 */
+  border-radius: 10px;
+  background-color: lightblue;
+}
+
+.right-panel-wrapper {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #fff;
+  flex: 1;
 }
 
 .left-panel-wrapper { /* 添加的样式 */
@@ -222,5 +257,61 @@ textarea {
 .audio-button button.selected {
   background-color: #0056b3; /* 设置按钮点击背景色 */
   color: white;
+}
+
+.image-container {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.image-container.top {
+  height: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-container.bottom {
+  height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-container.top.large-image {
+  height: 70%;
+}
+
+.image-container.bottom.small-image {
+  height: 100%;
+  width: 50%;
+}
+
+.split-container {
+  display: flex;
+  height: 30%;
+}
+
+.image-display {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 10px;
+}
+
+.text-container {
+  width: 50%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.text-container textarea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border-radius: 10px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 </style>
