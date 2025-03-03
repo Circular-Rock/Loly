@@ -4,7 +4,7 @@
       <img src="@/assets/loli.jpg" alt="Loli Image" class="loli-image" />
     </div>
     <div class="login-box">
-      <h2 class="project-title">清纯白毛小萝莉</h2>
+      <h2 class="project-title">虚拟数字主播</h2>
       <input v-model="username" type="text" placeholder="用户名" class="login-input" />
       <input v-model="password" type="password" placeholder="密码" class="login-input" />
       <div class="button-container">
@@ -18,6 +18,7 @@
 
 <script>
 import axios from 'axios';
+import {useRouter} from "vue-router";
 
 export default {
   name: 'UserLogin',
@@ -28,6 +29,10 @@ export default {
       serverMessage: '',
       serverMessageType: ''
     };
+  },
+  setup() {
+    const router = useRouter(); // 初始化 router
+    return { router };
   },
   methods: {
     login() {
@@ -44,17 +49,16 @@ export default {
       })
       .then(response => {
         this.serverMessage = response.data.message;
-        this.serverMessageType = response.data.status === 'success' ? 'success' : 'error';
-        console.log('登录成功:', response.data);
+        console.log(this.serverMessage);
+        this.router.push('/ImageDisplay');
+        console.log('注册成功:', response.data);
       })
       .catch(error => {
-        this.serverMessage = error.response.data.message;
-        this.serverMessageType = 'error';
         console.error('登录失败:', error);
       });
     },
     register() {
-      // 处理注册逻辑
+      this.router.push('/register');
       console.log('Register button clicked');
     }
   }

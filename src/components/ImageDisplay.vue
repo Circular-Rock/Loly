@@ -57,14 +57,15 @@ export default {
         },
         {
           label: '提交声音信息', action: () => {
-            this.sendAudioToBackend();
+            this.sendAudioFileToBackend();
           }
         }
       ],
       imageSrc: require('@/assets/logo.png'),
       videoSrc: null,
       inputText: '',
-      audioFiles: []
+      audioFiles: [],
+      audioUrl: '' // 新增字段用于存储 audio_file 的 url
     };
   },
   methods: {
@@ -113,6 +114,7 @@ export default {
           console.log('Backend response:', response.data);
           if (response.data.code === 0) {
             this.audioFiles = response.data.audio_files;
+            this.audioUrl = response.data.audio_files[0].url; // 保存 audio_file 的 url
           } else {
             console.error('Error in backend response:', response.data.msg);
           }
@@ -121,34 +123,55 @@ export default {
           console.error('Error sending voice to backend:', error);
         });
     },
-    sendAudioToBackend() {
-      const audioPath = require('@/assets/1.mp3');
-      const imagePath = require('@/assets/wrs.jpg');
-
-      Promise.all([
-        fetch(audioPath).then(response => response.blob()),
-        fetch(imagePath).then(response => response.blob())
-      ]).then(([audioBlob, imageBlob]) => {
+    sendAudioFileToBackend() {
+      if (this.audioUrl) {
+        // 如果 audioUrl 不为空，发送 audioUrl 到后端
         const formData = new FormData();
-        formData.append('audio', new File([audioBlob], '1.mp3', {type: 'audio/mpeg'}));
-        formData.append('image', new File([imageBlob], 'wrs.jpg', {type: 'image/jpeg'}));
+        formData.append('audio_url', this.audioUrl);
 
         axios.post(video_generated_URL, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).then(response => {
-          console.log('Audio and image sent successfully:', response);
+          console.log('Audio URL sent successfully:', response);
           this.videoSrc = video_play_URL + response.data['url'];
           console.log(response);
           console.log(video_play_URL);
-          console.log(this.videoSrc)
+          console.log(this.videoSrc);
         }).catch(error => {
-          console.error('Error sending audio and image:', error);
+          console.error('Error sending audio URL to backend:', error);
         });
-      }).catch(error => {
-        console.error('Error fetching audio or image file:', error);
-      });
+      } else {
+        // 如果 audioUrl 为空，发送 1.mp3 到后端
+        const audioPath = require('@/assets/1.mp3');
+        const imagePath = require('@/assets/wrs.jpg');
+
+        Promise.all([
+          fetch(audioPath).then(response => response.blob()),
+          fetch(imagePath).then(response => response.blob())
+        ]).then(([audioBlob, imageBlob]) => {
+          const formData = new FormData();
+          formData.append('audio', new File([audioBlob], '1.mp3', {type: 'audio/mpeg'}));
+          formData.append('image', new File([imageBlob], 'wrs.jpg', {type: 'image/jpeg'}));
+
+          axios.post(video_generated_URL, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then(response => {
+            console.log('Audio and image sent successfully:', response);
+            this.videoSrc = video_play_URL + response.data['url'];
+            console.log(response);
+            console.log(video_play_URL);
+            console.log(this.videoSrc);
+          }).catch(error => {
+            console.error('Error sending audio and image:', error);
+          });
+        }).catch(error => {
+          console.error('Error fetching audio or image file:', error);
+        });
+      }
     }
   }
 };
@@ -247,8 +270,8 @@ export default {
 }
 
 .display-video {
-  max-width: 50%;
-  max-height: 50%;
+  width: 100%;
+  height: 100%
 }
 
 .display-image {

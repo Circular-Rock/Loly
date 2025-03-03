@@ -7,7 +7,7 @@ import ImageDisplay from "../components/ImageDisplay.vue";
    const routes = [
      {
        path: '/',
-       redirect: '/ImageDisplay'
+       redirect: '/login'
      },
      {
        path: '/register',
