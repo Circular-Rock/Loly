@@ -3,7 +3,7 @@
     <div class="left-panel">
       <div class="left-panel-wrapper"> <!-- 添加的包裹容器 -->
         <div class="container">
-          <div class="inner-container"> <!-- 新增的内部包裹容器 -->
+          <div class="inner-container title-button-group"> <!-- 合并后的内部包裹容器 -->
             <h3>音色</h3>
             <div class="button-group vertical grid">
               <button v-for="(option) in voiceOptions" :key="option" @click="selectVoice(option)" :class="{ selected: selectedVoice === option }">
@@ -59,8 +59,8 @@ export default {
   name: 'UserConsole',
   data() {
     return {
-      voiceOptions: ['1', '2', '3', '4', '5', '随机'], // 添加了六个选项
-      promptOptions: ['1', '2', '3'],
+      voiceOptions: ['2222', '7869', '6653', '4099', '5099', '随机'], // 添加了六个选项
+      promptOptions: ['oral_2', 'laugh_0', 'break_6'],
       speed: 3,
       textInput: '',
       imageUrl: '',
@@ -134,8 +134,17 @@ export default {
   height: 100%; /* 使内部容器占满文本框容器 */
 }
 
+.inner-container.title-button-group { /* 新增的样式 */
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  background-color: #fff;
+  height: 100%; /* 使内部容器占满文本框容器 */
+}
+
 .button-group {
   display: flex;
+  justify-content: space-between; /* 修改为水平分布并均匀间隔 */
   gap: 10px;
 }
 
@@ -145,12 +154,13 @@ export default {
 
 .button-group.grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr); /* 修改为三等分 */
   gap: 10px;
 }
 
 .button-group button {
-  padding: 10px 20px;
+  padding: 10px 40px; /* 增加按钮的宽度 */
+  flex: 0 0 30%; /* 设置每个按钮的宽度为30% */
 }
 
 .button-group button.selected {
@@ -208,7 +218,9 @@ textarea {
   cursor: pointer; /* 设置鼠标悬停效果 */
 }
 
-.audio-button button:hover {
-  background-color: #0056b3; /* 设置按钮悬停背景色 */
+.audio-button button:active,
+.audio-button button.selected {
+  background-color: #0056b3; /* 设置按钮点击背景色 */
+  color: white;
 }
 </style>
