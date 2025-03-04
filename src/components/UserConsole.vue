@@ -375,8 +375,17 @@ textarea {
 }
 
 .image-container.bottom.small-image {
-  height: 100%;
-  width: 100%;
+  width: 200px; /* 设置固定宽度 */
+  height: 150px; /* 设置固定高度 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-container.bottom.small-image img {
+  width: 200px; /* 设置固定宽度 */
+  height: 200px; /* 设置固定高度 */
+  object-fit: cover; /* 保持图片比例并裁剪 */
 }
 
 .bottom-container {
