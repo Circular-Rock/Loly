@@ -22,12 +22,10 @@
             </div>
           </div>
         </div>
-        <div class="container">
-          <div class="inner-container"> <!-- 新增的内部包裹容器 -->
-            <h3>语速</h3>
-            <input type="range" min="1" max="5" v-model="speed" />
-            <span>{{ speed }}</span>
-          </div>
+        <div class="container speed-container"> <!-- 新增的语速容器 -->
+          <h3>语速</h3>
+          <input type="range" min="1" max="5" v-model="speed" />
+          <span>{{ speed }}</span>
         </div>
         <div class="container text-area-container"> <!-- 新增的文本框容器 -->
           <div class="inner-container"> <!-- 新增的内部包裹容器 -->
@@ -54,12 +52,13 @@
     <div class="right-panel"> <!-- 新增的右侧容器 -->
       <div class="right-panel-wrapper"> <!-- 添加的包裹容器 -->
         <div class="image-container top large-image"> <!-- 大的图片显示框 -->
-          <img :src="imageUrl" alt="Image 1" class="image-display" />
+          <img :src="largeImageUrl" alt="Image 1" class="image-display" />
         </div>
         <div class="bottom-container"> <!-- 下半部分容器 -->
           <div class="split-container"> <!-- 分割容器 -->
             <div class="image-container bottom small-image"> <!-- 小的图片显示框2 -->
-              <img :src="imageUrl" alt="Image 2" class="image-display" />
+              <img :src="smallImageUrl" alt="Image 2" class="image-display" @click="openFileInput('small')" />
+              <input type="file" ref="smallFileInput" @change="handleFileChange('small')" accept="image/*" style="display: none;" />
             </div>
             <div class="text-container"> <!-- 文本输入框容器 -->
               <textarea v-model="textInput" placeholder="输入文本"></textarea>
@@ -80,7 +79,8 @@ export default {
       promptOptions: ['oral_2', 'laugh_0', 'break_6'],
       speed: 3,
       textInput: '',
-      imageUrl: '',
+      largeImageUrl: '', // 新增的大图片URL
+      smallImageUrl: '', // 新增的小图片URL
       audioUrl: '',
       selectedVoice: null, // 新增的选中音色状态
       selectedPrompt: null // 新增的选中Prompt状态
@@ -102,6 +102,15 @@ export default {
     generateAudio() {
       console.log('Generating Audio...');
       // 这里可以添加生成声音的逻辑
+    },
+    openFileInput(type) {
+      this.$refs[`${type}FileInput`].click();
+    },
+    handleFileChange(type) {
+      const file = event.target.files[0];
+      if (file) {
+        this[`${type}ImageUrl`] = URL.createObjectURL(file);
+      }
     }
   }
 };
@@ -120,6 +129,8 @@ export default {
   display: flex;
   flex-direction: column; /* 使左侧容器竖直排列 */
   flex: 1; /* 使左侧容器占满整个左侧一列 */
+  border-radius: 10px;
+  background-color: lightpink;
 }
 
 .right-panel {
@@ -138,6 +149,8 @@ export default {
   padding: 10px;
   background-color: #fff;
   flex: 1;
+  display: flex; /* 添加弹性布局 */
+  flex-direction: column; /* 修改为垂直布局 */
 }
 
 .left-panel-wrapper { /* 添加的样式 */
@@ -161,6 +174,64 @@ export default {
   padding: 20px;
   display: flex;
   justify-content: space-between;
+}
+
+.container.speed-container { /* 新增的语速容器样式 */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+.container.speed-container input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  outline: none;
+  transition: background 0.2s;
+}
+
+.container.speed-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.container.speed-container input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.container.speed-container input[type="range"]:hover {
+  background: #ccc;
+}
+
+.container.speed-container input[type="range"]:hover::-webkit-slider-thumb {
+  background: #0056b3;
+}
+
+.container.speed-container input[type="range"]:hover::-moz-range-thumb {
+  background: #0056b3;
+}
+
+.container.speed-container span {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
 }
 
 .inner-container { /* 新增的样式 */
@@ -281,6 +352,8 @@ textarea {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
+  border: 1px solid #ccc; /* 添加灰色边框 */
+  border-radius: 10px; /* 添加圆润边框 */
 }
 
 .image-container.top {
@@ -303,12 +376,19 @@ textarea {
 
 .image-container.bottom.small-image {
   height: 100%;
-  width: 50%;
+  width: 100%;
+}
+
+.bottom-container {
+  display: flex; /* 添加弹性布局 */
+  flex-direction: row; /* 修改为水平布局 */
+  flex: 1; /* 使底部容器占满剩余空间 */
 }
 
 .split-container {
   display: flex;
-  height: 30%;
+  height: 100%; /* 修改高度为100% */
+  flex: 1; /* 使分割容器占满底部容器 */
 }
 
 .image-display {
@@ -317,9 +397,14 @@ textarea {
   border-radius: 10px;
 }
 
+.image-container.bottom.small-image {
+  width: 50%; /* 修改宽度为50% */
+  height: 100%; /* 修改高度为100% */
+}
+
 .text-container {
-  width: 50%;
-  height: 100%;
+  width: 50%; /* 修改宽度为50% */
+  height: 100%; /* 修改高度为100% */
   padding: 10px;
   box-sizing: border-box;
 }
