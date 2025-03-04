@@ -5,7 +5,7 @@
         <div class="container">
           <div class="inner-container title-button-group"> <!-- 合并后的内部包裹容器 -->
             <h3>音色</h3>
-            <div class="button-group vertical grid">
+            <div class="button-group vertical grid voice-button-group">
               <button v-for="(option) in voiceOptions" :key="option" @click="selectVoice(option)" :class="{ selected: selectedVoice === option }">
                 {{ option }}
               </button>
@@ -15,8 +15,8 @@
         <div class="container">
           <div class="inner-container"> <!-- 新增的内部包裹容器 -->
             <h3>Prompt</h3>
-            <div class="button-group">
-              <button v-for="option in promptOptions" :key="option" @click="selectPrompt(option)">
+            <div class="button-group prompt-button-group">
+              <button v-for="option in promptOptions" :key="option" @click="selectPrompt(option)" :class="{ selected: selectedPrompt === option }">
                 {{ option }}
               </button>
             </div>
@@ -82,7 +82,8 @@ export default {
       textInput: '',
       imageUrl: '',
       audioUrl: '',
-      selectedVoice: null // 新增的选中音色状态
+      selectedVoice: null, // 新增的选中音色状态
+      selectedPrompt: null // 新增的选中Prompt状态
     };
   },
   methods: {
@@ -91,6 +92,7 @@ export default {
       console.log('Selected Voice:', option);
     },
     selectPrompt(option) {
+      this.selectedPrompt = option; // 设置选中的Prompt
       console.log('Selected Prompt:', option);
     },
     generateAvatar() {
@@ -187,10 +189,26 @@ export default {
   flex-direction: column; /* 修改按钮排列方向为竖直 */
 }
 
-.button-group.grid {
+.button-group.voice-button-group {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 修改为三等分 */
   gap: 10px;
+}
+
+.button-group.voice-button-group button {
+  padding: 10px 40px; /* 增加按钮的宽度 */
+  flex: 0 0 30%; /* 设置每个按钮的宽度为30% */
+}
+
+.button-group.prompt-button-group {
+  display: flex;
+  justify-content: space-between; /* 修改为水平分布并均匀间隔 */
+  gap: 10px;
+}
+
+.button-group.prompt-button-group button {
+  padding: 10px 20px; /* 修改按钮的宽度 */
+  flex: 1; /* 设置每个按钮的宽度为相等 */
 }
 
 .button-group button {
