@@ -51,17 +51,22 @@
     </div>
     <div class="right-panel"> <!-- 新增的右侧容器 -->
       <div class="right-panel-wrapper"> <!-- 添加的包裹容器 -->
-        <div class="image-container top large-image"> <!-- 大的图片显示框 -->
-          <img :src="largeImageUrl" alt="Image 1" class="image-display" />
+        <div class="video-container top large-video"> <!-- 大的视频显示框 -->
+          <video :src="largeVideoUrl" controls v-if="largeVideoUrl" class="video-display"></video>
         </div>
         <div class="bottom-container"> <!-- 下半部分容器 -->
           <div class="split-container"> <!-- 分割容器 -->
-            <div class="image-container bottom small-image"> <!-- 小的图片显示框2 -->
-              <img :src="smallImageUrl" alt="Image 2" class="image-display" @click="openFileInput('small')" />
-              <input type="file" ref="smallFileInput" @change="handleFileChange('small')" accept="image/*" style="display: none;" />
+            <div class="video-container bottom small-video"> <!-- 小的视频显示框2 -->
+              <div class="video-display" @click="openFileInput('small')">
+                <video v-if="smallVideoUrl" :src="smallVideoUrl" controls class="video-display"></video>
+                <span v-else class="upload-prompt">请上传视频</span>
+              </div>
+              <input type="file" ref="smallFileInput" @change="handleFileChange('small')" accept="video/*" style="display: none;" />
             </div>
             <div class="text-container"> <!-- 文本输入框容器 -->
-              <textarea v-model="textInput" placeholder="输入文本"></textarea>
+              <div class="inline-container"> <!-- 新增的内联容器 -->
+                <textarea v-model="textInput" placeholder="输入文本"></textarea>
+              </div>
             </div>
           </div>
         </div>
@@ -79,8 +84,8 @@ export default {
       promptOptions: ['oral_2', 'laugh_0', 'break_6'],
       speed: 3,
       textInput: '',
-      largeImageUrl: '', // 新增的大图片URL
-      smallImageUrl: '', // 新增的小图片URL
+      largeVideoUrl: '', // 修改为大视频URL
+      smallVideoUrl: '', // 修改为小视频URL
       audioUrl: '',
       selectedVoice: null, // 新增的选中音色状态
       selectedPrompt: null // 新增的选中Prompt状态
@@ -109,7 +114,7 @@ export default {
     handleFileChange(type) {
       const file = event.target.files[0];
       if (file) {
-        this[`${type}ImageUrl`] = URL.createObjectURL(file);
+        this[`${type}VideoUrl`] = URL.createObjectURL(file); // 修改为视频URL
       }
     }
   }
@@ -348,7 +353,7 @@ textarea {
   color: white;
 }
 
-.image-container {
+.video-container {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
@@ -356,59 +361,61 @@ textarea {
   border-radius: 10px; /* 添加圆润边框 */
 }
 
-.image-container.top {
+.video-container.top {
   height: 70%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.image-container.bottom {
+.video-container.bottom {
   height: 30%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.image-container.top.large-image {
+.video-container.top.large-video {
   height: 70%;
 }
 
-.image-container.bottom.small-image {
-  width: 200px; /* 设置固定宽度 */
-  height: 150px; /* 设置固定高度 */
+.video-container.bottom.small-video {
+  width: 50%;
+  height: 100%;
+  background-color: #f9f9f9; /* 设置背景色 */
+  position: relative; /* 添加相对定位 */
+}
+
+.video-container.bottom.small-video .video-display {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
-.image-container.bottom.small-image img {
-  width: 200px; /* 设置固定宽度 */
-  height: 200px; /* 设置固定高度 */
-  object-fit: cover; /* 保持图片比例并裁剪 */
+.video-container.bottom.small-video .video-display video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.bottom-container {
-  display: flex; /* 添加弹性布局 */
-  flex-direction: row; /* 修改为水平布局 */
-  flex: 1; /* 使底部容器占满剩余空间 */
+.video-container.bottom.small-video .upload-prompt {
+  font-size: 14px;
+  color: #888;
+  text-align: center;
 }
 
-.split-container {
-  display: flex;
-  height: 100%; /* 修改高度为100% */
-  flex: 1; /* 使分割容器占满底部容器 */
-}
-
-.image-display {
-  max-width: 100%;
-  max-height: 100%;
+.video-display {
+  max-width: 200px;
+  max-height: 200px;
   border-radius: 10px;
 }
 
-.image-container.bottom.small-image {
-  width: 50%; /* 修改宽度为50% */
-  height: 100%; /* 修改高度为100% */
+.video-container.bottom.small-video {
+  width: 250px;
+  height: 250px;
 }
 
 .text-container {
@@ -425,5 +432,38 @@ textarea {
   border-radius: 10px;
   padding: 10px;
   box-sizing: border-box;
+}
+
+.inline-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.audio-button button {
+  background-color: lightblue; /* 设置按钮背景色 */
+  color: white; /* 设置按钮文字颜色 */
+  border: none; /* 移除按钮边框 */
+  border-radius: 5px; /* 添加按钮圆角 */
+  padding: 10px 20px; /* 设置按钮内边距 */
+  cursor: pointer; /* 设置鼠标悬停效果 */
+}
+
+.audio-button button:active,
+.audio-button button.selected {
+  background-color: #0056b3; /* 设置按钮点击背景色 */
+  color: white;
+}
+
+.bottom-container {
+  display: flex; /* 添加弹性布局 */
+  flex-direction: row; /* 修改为水平布局 */
+  flex: 1; /* 使底部容器占满剩余空间 */
+}
+
+.split-container {
+  display: flex;
+  height: 100%; /* 修改高度为100% */
+  flex: 1; /* 使分割容器占满底部容器 */
 }
 </style>

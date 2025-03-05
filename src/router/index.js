@@ -4,11 +4,12 @@ import UserLogin from '../components/UserLogin.vue';
 import NotFound from "../components/NotFound.vue";
 import ImageDisplay from "../components/ImageDisplay.vue";
 import UserConsole from "../components/UserConsole.vue";
+import WebRTCComponent from "../components/WebRTCComponent.vue";
 
    const routes = [
      {
        path: '/',
-       redirect: '/UserConsole'
+       redirect: '/console'
      },
      {
        path: '/register',
@@ -29,6 +30,11 @@ import UserConsole from "../components/UserConsole.vue";
        path: '/console',
        name: 'UserConsole',
        component: UserConsole
+     },
+     {
+       path: '/webrtc',
+       name: 'WebRTCComponent',
+       component: WebRTCComponent
      },
      {
        path: '/:pathMatch(.*)*',
