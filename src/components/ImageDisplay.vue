@@ -8,7 +8,7 @@
       </div>
       <div class="input-section">
         <textarea v-model="inputText" placeholder="Enter text here" class="input-textarea"></textarea>
-        <button @click="handleSubmit" class="submit-button">提交</button>
+        <button @click="handleSubmit" class="submit-button">控制台</button> <!-- 修改提交按钮文本 -->
       </div>
     </div>
     <div class="main-content">
@@ -78,6 +78,7 @@ export default {
         text: this.inputText
       };
       this.sendTextToBackend(payload);
+      this.$router.push('/console'); // 添加跳转事件
     },
     sendTextToBackend(payload) {
       console.log(payload);

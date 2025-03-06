@@ -20,8 +20,8 @@ def handle_register_request(request):
         return jsonify({'status': 'error', 'message': '用户名和密码不能为空'}), 400
 
     try:
-        add_user(username, password)
-        return jsonify({'status': 'success', 'message': '用户注册成功'}), 200
+        user_id = add_user(username, password)
+        return jsonify({'status': 'success', 'message': '用户注册成功','user_id':str(user_id)}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
@@ -41,4 +41,4 @@ def handle_login_request(request):
     if not user:
         return jsonify({'status': 'error', 'message': '密码错误'}), 400
 
-    return jsonify({'status': 'success', 'message': '登录成功'}), 200
+    return jsonify({'status': 'success', 'message': '登录成功','user_id':str(user[0][0])}), 200

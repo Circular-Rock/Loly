@@ -8,7 +8,9 @@ def add_user(user_name, user_password):
         with connection.cursor() as cursor:
             sql = "INSERT INTO user_login (user_name, user_password) VALUES (%s, %s)"
             cursor.execute(sql, (user_name, user_password))
+            user_id = cursor.lastrowid  # 获取新插入行的ID
         connection.commit()
+        return user_id  # 返回新插入用户的user_id
     finally:
         connection.close()
 

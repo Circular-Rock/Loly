@@ -37,7 +37,7 @@
             <div class="audio-display-container">
               <div class="audio-display">
                 <h3>声音展示</h3>
-                <audio v-if="audioUrl" :src="audioUrl" controls></audio>
+                <audio id="audio" controls></audio>
               </div>
             </div>
             <div class="audio-button-container">
@@ -52,7 +52,7 @@
     <div class="right-panel"> <!-- 新增的右侧容器 -->
       <div class="right-panel-wrapper"> <!-- 添加的包裹容器 -->
         <div class="video-container top large-video"> <!-- 大的视频显示框 -->
-          <video :src="largeVideoUrl" controls v-if="largeVideoUrl" class="video-display"></video>
+          <video id="video" controls class="video-display"></video>
         </div>
         <div class="bottom-container"> <!-- 下半部分容器 -->
           <div class="split-container"> <!-- 分割容器 -->
@@ -65,7 +65,15 @@
             </div>
             <div class="text-container"> <!-- 文本输入框容器 -->
               <div class="inline-container"> <!-- 新增的内联容器 -->
-                <textarea v-model="textInput" placeholder="输入文本"></textarea>
+                <textarea v-model="message" placeholder="输入文本"></textarea>
+              </div>
+              <div class="button-container">
+                <div class="button-wrapper">
+                  <button @click="start" :disabled="started">Start</button>
+                </div>
+                <div class="button-wrapper">
+                  <button @click="stop" :disabled="!started">Stop</button>
+                </div>
               </div>
             </div>
           </div>
@@ -76,22 +84,98 @@
 </template>
 
 <script>
+import axios from 'axios'; // 引入 axios
+
 export default {
   name: 'UserConsole',
   data() {
     return {
+      pc: null,
+      useStun: false,
+      started: false,
+      sessionId: 0,
+      message: '',
       voiceOptions: ['2222', '7869', '6653', '4099', '5099', '随机'], // 添加了六个选项
       promptOptions: ['oral_2', 'laugh_0', 'break_6'],
       speed: 3,
       textInput: '',
-      largeVideoUrl: '', // 修改为大视频URL
       smallVideoUrl: '', // 修改为小视频URL
-      audioUrl: '',
       selectedVoice: null, // 新增的选中音色状态
       selectedPrompt: null // 新增的选中Prompt状态
     };
   },
   methods: {
+    negotiate() {
+      this.pc.addTransceiver('video', { direction: 'recvonly' });
+      this.pc.addTransceiver('audio', { direction: 'recvonly' });
+      return this.pc.createOffer().then((offer) => {
+        return this.pc.setLocalDescription(offer);
+      }).then(() => {
+        return new Promise((resolve) => {
+          if (this.pc.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            const checkState = () => {
+              if (this.pc.iceGatheringState === 'complete') {
+                this.pc.removeEventListener('icegatheringstatechange', checkState);
+                resolve();
+              }
+            };
+            this.pc.addEventListener('icegatheringstatechange', checkState);
+          }
+        });
+      }).then(() => {
+        const offer = this.pc.localDescription;
+        return axios.post('http://10.10.24.171:5000/offer', {
+          sdp: offer.sdp,
+          type: offer.type,
+        });
+      }).then((response) => {
+        this.sessionId = response.data.sessionid;
+        return this.pc.setRemoteDescription(response.data);
+      }).catch((e) => {
+        alert(e);
+      });
+    },
+    start() {
+      const config = {
+        sdpSemantics: 'unified-plan'
+      };
+
+      if (this.useStun) {
+        config.iceServers = [{ urls: ['stun:stun.l.google.com:19302'] }];
+      }
+
+      this.pc = new RTCPeerConnection(config);
+
+      this.pc.addEventListener('track', (evt) => {
+        if (evt.track.kind === 'video') {
+          document.getElementById('video').srcObject = evt.streams[0]; // 修改为直接赋值 srcObject
+        } else {
+          document.getElementById('audio').srcObject = evt.streams[0]; // 修改为直接赋值 srcObject
+        }
+      });
+
+      this.started = true;
+      this.negotiate();
+    },
+    stop() {
+      this.started = false;
+      setTimeout(() => {
+        this.pc.close();
+      }, 500);
+    },
+    sendMessage() {
+      console.log('Sending: ' + this.message);
+      console.log('sessionid: ', this.sessionId);
+      axios.post('http://10.10.24.171:5000/human', {
+        text: this.message,
+        type: 'echo',
+        interrupt: true,
+        sessionid: parseInt(this.sessionId),
+      });
+      this.message = '';
+    },
     selectVoice(option) {
       this.selectedVoice = option; // 设置选中的音色
       console.log('Selected Voice:', option);
@@ -117,6 +201,24 @@ export default {
         this[`${type}VideoUrl`] = URL.createObjectURL(file); // 修改为视频URL
       }
     }
+  },
+  mounted() {
+    window.onunload = () => {
+      setTimeout(() => {
+        if (this.pc) this.pc.close();
+      }, 500);
+    };
+
+    window.onbeforeunload = (e) => {
+      setTimeout(() => {
+        if (this.pc) this.pc.close();
+      }, 500);
+      e = e || window.event;
+      if (e) {
+        e.returnValue = '关闭提示';
+      }
+      return '关闭提示';
+    };
   }
 };
 </script>
@@ -465,5 +567,18 @@ textarea {
   display: flex;
   height: 100%; /* 修改高度为100% */
   flex: 1; /* 使分割容器占满底部容器 */
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48%;
 }
 </style>
