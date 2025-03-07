@@ -34,12 +34,16 @@
     </div>
     <div class="right-panel">
       <div class="right-panel-wrapper">
-        <div class="top-container">
-          <div class="video-display" id="video">
-            <video controls></video>
-          </div>
-          <div class="audio-display" id="audio">
-            <audio controls></audio>
+        <div class="video-container top large-video">
+          <video id="video" controls class="video-display"></video>
+        </div>
+        <div class="container audio-container"> <!-- 新增的声音展示容器 -->
+          <div class="inner-container audio-wrapper">
+            <div class="audio-display-container">
+              <div class="audio-display">
+                <audio id="audio" controls></audio>
+              </div>
+            </div>
           </div>
         </div>
         <div class="bottom-container">
@@ -166,27 +170,27 @@ export default {
       formData.append('text', this.textInput);
       if (this.largeVideoUrl) {
         fetch(this.largeVideoUrl)
-          .then(r => r.blob())
-          .then(videoBlob => {
-            formData.append('video', videoBlob, 'video.mp4');
-            if (this.audioUrl) {
-              fetch(this.audioUrl)
-                .then(r => r.blob())
-                .then(audioBlob => {
-                  formData.append('audio', audioBlob, 'audio.mp3');
-                  this.uploadFiles(formData);
-                });
-            } else {
-              this.uploadFiles(formData);
-            }
-          });
+            .then(r => r.blob())
+            .then(videoBlob => {
+              formData.append('video', videoBlob, 'video.mp4');
+              if (this.audioUrl) {
+                fetch(this.audioUrl)
+                    .then(r => r.blob())
+                    .then(audioBlob => {
+                      formData.append('audio', audioBlob, 'audio.mp3');
+                      this.uploadFiles(formData);
+                    });
+              } else {
+                this.uploadFiles(formData);
+              }
+            });
       } else if (this.audioUrl) {
         fetch(this.audioUrl)
-          .then(r => r.blob())
-          .then(audioBlob => {
-            formData.append('audio', audioBlob, 'audio.mp3');
-            this.uploadFiles(formData);
-          });
+            .then(r => r.blob())
+            .then(audioBlob => {
+              formData.append('audio', audioBlob, 'audio.mp3');
+              this.uploadFiles(formData);
+            });
       }
     },
     openFileInput(type) {
@@ -222,12 +226,12 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       })
-      .then(response => {
-        console.log('Upload success:', response.data);
-      })
-      .catch(error => {
-        console.error('Upload error:', error);
-      });
+          .then(response => {
+            console.log('Upload success:', response.data);
+          })
+          .catch(error => {
+            console.error('Upload error:', error);
+          });
     }
   },
   mounted() {
@@ -471,7 +475,7 @@ textarea {
 }
 
 .text-container {
-  width: 50%;
+  width: 100%;
   height: 100%;
   padding: 10px;
   box-sizing: border-box;

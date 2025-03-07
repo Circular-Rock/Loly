@@ -36,7 +36,6 @@
           <div class="inner-container audio-wrapper">
             <div class="audio-display-container">
               <div class="audio-display">
-                <h3>声音展示</h3>
                 <audio id="audio" controls></audio>
               </div>
             </div>
