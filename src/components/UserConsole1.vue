@@ -22,13 +22,13 @@
             </div>
             <div class="audio-button-container">
               <div class="audio-button">
-                <button @click="submitVideoAndAudio">提交音频视频</button>
-              </div>
-              <div class="text-input-container">
-                <input type="text" v-model="textInput" placeholder="输入文本"/>
+                <button @click="submitVideoAndAudio">提交</button>
               </div>
             </div>
           </div>
+        </div>
+        <div class="text-input-container">
+          <input type="text" v-model="textInput" placeholder="输入文本" class="square-input"/>
         </div>
       </div>
     </div>
@@ -535,7 +535,15 @@ textarea {
 }
 
 .text-input-container input[type="text"] {
+  width: 90%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.square-input {
   width: 100%;
+  height: 40px; /* 设置高度以使其成为方块形 */
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
