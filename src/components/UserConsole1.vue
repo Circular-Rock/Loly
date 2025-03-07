@@ -387,9 +387,8 @@ textarea {
 }
 
 .audio-display-container {
-  width: 80%;
+  width: 100%;
   border-radius: 10px;
-  background-color: lightblue;
 }
 
 .audio-button-container {
