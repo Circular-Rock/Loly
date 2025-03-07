@@ -60,7 +60,7 @@
                   <button @click="stop" :disabled="!started">Stop</button>
                 </div>
                 <div class="button-wrapper">
-                  <button @click="startDVanchor">Start DV Anchor</button>
+                  <button @click="toggleDVanchor">{{ dvAnchorButtonText }}</button>
                 </div>
                 <div class="button-wrapper">
                   <button @click="sendMessage">sendMessage</button>
@@ -79,7 +79,7 @@
 
 <script>
 import axios from 'axios';
-import {offer_URL, sendmessage_URL, start_URL, close_URL, upload_URL} from "@/router/config";
+import {offer_URL, sendmessage_URL, start_URL, upload_URL, close_URL} from "@/router/config";
 
 export default {
   name: 'UserConsole1',
@@ -98,8 +98,16 @@ export default {
       largeVideoUrl: '',
       audioUrl: '', // 新增的 audioUrl 状态
       selectedVoice: null,
-      selectedPrompt: null
+      selectedPrompt: null,
+      // 新增状态变量来跟踪按钮的当前状态
+      dvAnchorStarted: false
     };
+  },
+  computed: {
+    // 计算属性来动态设置按钮文本
+    dvAnchorButtonText() {
+      return this.dvAnchorStarted ? 'Close DV Anchor' : 'Start DV Anchor';
+    }
   },
   methods: {
     negotiate() {
@@ -243,12 +251,23 @@ export default {
     startDVanchor() {
       axios.post(start_URL, {
         username: 'user1'
+      }).then(() => {
+        this.dvAnchorStarted = true; // 更新状态变量
       });
     },
-    closeDVanchor(){
-      axios.post(close_URL,{
+    closeDVanchor() {
+      axios.post(close_URL, {
         username: 'user1'
+      }).then(() => {
+        this.dvAnchorStarted = false; // 更新状态变量
       });
+    },
+    toggleDVanchor() {
+      if (this.dvAnchorStarted) {
+        this.closeDVanchor();
+      } else {
+        this.startDVanchor();
+      }
     },
     useAnchor() {
       this.$router.push('/ImageDisplay');

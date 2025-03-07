@@ -51,7 +51,7 @@ export default {
           }
         },
         {
-          label: '提交文案信息', action: () => {
+          label: '将文案要发送到后端', action: () => {
             this.sendVoiceToBackend();
           }
         },
