@@ -65,6 +65,9 @@
                 <div class="button-wrapper">
                   <button @click="sendMessage">sendMessage</button>
                 </div>
+                <div class="button-wrapper">
+                  <button @click="useAnchor">使用主播</button>
+                </div>
               </div>
             </div>
           </div>
@@ -76,6 +79,7 @@
 
 <script>
 import axios from 'axios';
+import {offer_URL, sendmessage_URL, start_URL, close_URL, upload_URL} from "@/router/config";
 
 export default {
   name: 'UserConsole1',
@@ -119,7 +123,7 @@ export default {
         });
       }).then(() => {
         const offer = this.pc.localDescription;
-        return axios.post('http://10.10.24.123:5000/offer', {
+        return axios.post(offer_URL, {
           sdp: offer.sdp,
           type: offer.type,
         });
@@ -161,7 +165,7 @@ export default {
     sendMessage() {
       console.log('Sending: ' + this.message);
       console.log('sessionid: ', this.sessionId);
-      axios.post('http://10.10.24.123:5000/human', {
+      axios.post(sendmessage_URL, {
         text: this.message,
         type: 'echo',
         interrupt: true,
@@ -226,22 +230,28 @@ export default {
       }
     },
     uploadFiles(formData) {
-      axios.post('http://10.10.24.123:5000/upload', formData, {
+      axios.post(upload_URL, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
-      })
-          .then(response => {
-            console.log('Upload success:', response.data);
-          })
-          .catch(error => {
-            console.error('Upload error:', error);
-          });
+      }).then(response => {
+        console.log('Upload success:', response.data);
+      }).catch(error => {
+        console.error('Upload error:', error);
+      });
     },
     startDVanchor() {
-      axios.post('http://10.10.24.123:5000/start', {
+      axios.post(start_URL, {
         username: 'user1'
       });
+    },
+    closeDVanchor(){
+      axios.post(close_URL,{
+        username: 'user1'
+      });
+    },
+    useAnchor() {
+      this.$router.push('/ImageDisplay');
     }
   },
   mounted() {
@@ -548,7 +558,7 @@ textarea {
 }
 
 .text-input-container input[type="text"] {
-  width: 90%;
+  width: 95%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;

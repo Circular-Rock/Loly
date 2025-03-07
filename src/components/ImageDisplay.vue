@@ -78,7 +78,7 @@ export default {
         text: this.inputText
       };
       this.sendTextToBackend(payload);
-      this.$router.push('/console'); // 添加跳转事件
+      this.$router.push('/console1'); // 添加跳转事件
     },
     sendTextToBackend(payload) {
       console.log(payload);
