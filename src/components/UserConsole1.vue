@@ -2,8 +2,8 @@
   <div class="console-container">
     <div class="left-panel">
       <div class="left-panel-wrapper">
-        <div class="container video-container top large-video">
-          <div class="video-display" @click="openFileInput('largeVideo')">
+        <div class="container video-container top large-video" @click="openFileInput('largeVideo')">
+          <div class="video-display">
             <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display"></video>
             <span v-else class="upload-prompt">请上传视频</span>
           </div>
@@ -59,6 +59,12 @@
                 <div class="button-wrapper">
                   <button @click="stop" :disabled="!started">Stop</button>
                 </div>
+                <div class="button-wrapper">
+                  <button @click="startDVanchor">Start DV Anchor</button>
+                </div>
+                <div class="button-wrapper">
+                  <button @click="sendMessage">sendMessage</button>
+                </div>
               </div>
             </div>
           </div>
@@ -113,7 +119,7 @@ export default {
         });
       }).then(() => {
         const offer = this.pc.localDescription;
-        return axios.post('http://10.10.24.171:5000/offer', {
+        return axios.post('http://10.10.24.123:5000/offer', {
           sdp: offer.sdp,
           type: offer.type,
         });
@@ -155,7 +161,7 @@ export default {
     sendMessage() {
       console.log('Sending: ' + this.message);
       console.log('sessionid: ', this.sessionId);
-      axios.post('http://10.10.24.171:5000/human', {
+      axios.post('http://10.10.24.123:5000/human', {
         text: this.message,
         type: 'echo',
         interrupt: true,
@@ -164,10 +170,9 @@ export default {
       this.message = '';
     },
     submitVideoAndAudio() {
-      console.log('Generating Audio...');
       const formData = new FormData();
-      formData.append('username', 'user1'); // 添加用户名到FormData
-      formData.append('text', this.textInput);
+      formData.append('username', 'user1');
+      formData.append('text', '天生万物以养人，世人犹怨天不仁。');
       if (this.largeVideoUrl) {
         fetch(this.largeVideoUrl)
             .then(r => r.blob())
@@ -211,7 +216,7 @@ export default {
     handleAudioChange() {
       const file = event.target.files[0];
       if (file) {
-        const allowedExtensions = /(\.mp3)$/i;
+        const allowedExtensions = /(\.wav)$/i;
         if (!allowedExtensions.exec(file.name)) {
           alert('请上传 mp3 格式的音频文件');
           this.$refs.audioFileInput.value = ''; // 清空文件输入
@@ -221,7 +226,7 @@ export default {
       }
     },
     uploadFiles(formData) {
-      axios.post('http://10.10.24.176:5000/upload', formData, {
+      axios.post('http://10.10.24.123:5000/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -232,6 +237,11 @@ export default {
           .catch(error => {
             console.error('Upload error:', error);
           });
+    },
+    startDVanchor() {
+      axios.post('http://10.10.24.123:5000/start', {
+        username: 'user1'
+      });
     }
   },
   mounted() {
