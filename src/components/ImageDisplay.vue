@@ -2,7 +2,7 @@
   <div class="container">
     <div class="sidebar">
       <div class="button-section">
-        <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button">
+        <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button" :disabled="option.disabled">
           {{ option.label }}
         </button>
         <button @click="toConsole" class="submit-button">控制台</button>
@@ -50,33 +50,37 @@ export default {
         {
           label: '启动数字人', action: () => {
             this.startDVanchor();
-          }
+          }, disabled: false
         },
         {
           label: '关闭数字人', action: () => {
             this.closeDVanchor();
-          }
+          }, disabled: true
         },
         {
           label: '启动直播', action: () => {
             this.start();
-          }
+          }, disabled: false
         },
         {
           label: '关闭直播', action: () => {
             this.stop();
-          }
+          }, disabled: true
         }
       ],
       pc: null,
       imageSrc: require('@/assets/logo.png'),
       videoSrc: null,
       inputText: '',
+      dvAnchorStarted: false,
+      liveStarted: false, // 添加状态变量
     };
   },
   methods: {
     handleClick(option) {
-      option.action();
+      if (!option.disabled) {
+        option.action();
+      }
     },
     toConsole() {
       this.$router.push('/console1');
@@ -156,10 +160,17 @@ export default {
       });
 
       this.started = true;
+      this.liveStarted = true; // 更新状态变量
+      this.options[4].disabled = true; // 禁用开启直播按钮
+      this.options[5].disabled = false; // 启用关闭直播按钮
       this.negotiate();
+
     },
     stop() {
       this.started = false;
+      this.liveStarted = false; // 更新状态变量
+      this.options[4].disabled = false; // 启用开启直播按钮
+      this.options[5].disabled = true; // 禁用关闭直播按钮
       setTimeout(() => {
         this.pc.close();
       }, 500);
@@ -169,6 +180,8 @@ export default {
         username: 'user1'
       }).then(() => {
         this.dvAnchorStarted = true; // 更新状态变量
+        this.options[2].disabled = true; // 禁用启动数字人按钮
+        this.options[3].disabled = false; // 启用关闭数字人按钮
       });
     },
     closeDVanchor() {
@@ -176,6 +189,8 @@ export default {
         username: 'user1'
       }).then(() => {
         this.dvAnchorStarted = false; // 更新状态变量
+        this.options[2].disabled = false; // 启用启动数字人按钮
+        this.options[3].disabled = true; // 禁用关闭数字人按钮
       });
     },
   }
@@ -220,6 +235,11 @@ export default {
 
 .sidebar-button:hover {
   background-color: #0056b3;
+}
+
+.sidebar-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .input-section {
