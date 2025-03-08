@@ -60,7 +60,7 @@ export default {
         {
           label: '启动直播', action: () => {
             this.start();
-          }, disabled: false
+          }, disabled: true
         },
         {
           label: '关闭直播', action: () => {
@@ -141,6 +141,10 @@ export default {
       });
     },
     start() {
+      if (!this.dvAnchorStarted) {
+        alert('请先开启数字人');
+        return;
+      }
       const config = {
         sdpSemantics: 'unified-plan'
       };
@@ -171,6 +175,7 @@ export default {
       this.liveStarted = false; // 更新状态变量
       this.options[4].disabled = false; // 启用开启直播按钮
       this.options[5].disabled = true; // 禁用关闭直播按钮
+
       setTimeout(() => {
         this.pc.close();
       }, 500);
@@ -182,15 +187,21 @@ export default {
         this.dvAnchorStarted = true; // 更新状态变量
         this.options[2].disabled = true; // 禁用启动数字人按钮
         this.options[3].disabled = false; // 启用关闭数字人按钮
+        this.options[4].disabled = false; // 启用开启直播按钮
       });
     },
     closeDVanchor() {
+      if (this.liveStarted) {
+        alert('请先关闭直播');
+        return;
+      }
       axios.post(close_URL, {
         username: 'user1'
       }).then(() => {
         this.dvAnchorStarted = false; // 更新状态变量
         this.options[2].disabled = false; // 启用启动数字人按钮
         this.options[3].disabled = true; // 禁用关闭数字人按钮
+        this.options[4].disabled = true; // 禁用开启直播按钮
       });
     },
   }
