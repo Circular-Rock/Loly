@@ -5,29 +5,22 @@
         <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button">
           {{ option.label }}
         </button>
+        <button @click="toConsole" class="submit-button">控制台</button>
       </div>
       <div class="input-section">
         <textarea v-model="inputText" placeholder="Enter text here" class="input-textarea"></textarea>
-        <button @click="handleSubmit" class="submit-button">控制台</button> <!-- 修改提交按钮文本 -->
+        <!-- <button @click="handleSubmit" class="submit-button">控制台</button>  修改提交按钮文本 -->
       </div>
     </div>
     <div class="main-content">
       <div class="video-container">
-        <video v-if="videoSrc" :src="videoSrc" controls class="display-video">
-          Your browser does not support the video tag.
-        </video>
-        <img v-else :src="imageSrc" alt="Display Image" class="display-image"/>
+        <div class="video-container top large-video">
+          <video id="video" controls class="video-display" autoplay></video>
+        </div>
       </div>
       <div class="audio-player-container">
-        <div v-if="audioFiles.length > 0">
-          <audio v-for="(audio, index) in audioFiles" :key="index" controls>
-            <source :src="audio.url" type="audio/mpeg">
-            Your browser does not support the audio element.
-          </audio>
-        </div>
-        <div v-else>
-          <!-- 占位内容，当没有音频文件时显示 -->
-          <p>暂无音频文件</p>
+        <div class="audio-display">
+          <audio id="audio" controls autoplay></audio>
         </div>
       </div>
     </div>
@@ -36,10 +29,9 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
-import {voice_generated_URL} from '@/router/config.js';
+import {sendmessage_URL} from '@/router/config.js';
 import {copywriting_generated_URL} from '@/router/config.js';
-import {video_generated_URL} from '@/router/config.js';
-import {video_play_URL} from '@/router/config.js';
+import {offer_URL, start_URL, close_URL} from "@/router/config";
 
 export default {
   data() {
@@ -47,133 +39,145 @@ export default {
       options: [
         {
           label: '提交商品信息', action: () => {
-            this.sendTextToBackend({ text: this.inputText });
+            this.sendTextToBackend({text: this.inputText});
           }
         },
         {
-          label: '将文案要发送到后端', action: () => {
-            this.sendVoiceToBackend();
+          label: '将文案发送到后端', action: () => {
+            this.sendMessage();
           }
         },
         {
-          label: '提交声音信息', action: () => {
-            this.sendAudioFileToBackend();
+          label: '启动数字人', action: () => {
+            this.startDVanchor();
+          }
+        },
+        {
+          label: '关闭数字人', action: () => {
+            this.closeDVanchor();
+          }
+        },
+        {
+          label: '启动直播', action: () => {
+            this.start();
+          }
+        },
+        {
+          label: '关闭直播', action: () => {
+            this.stop();
           }
         }
       ],
+      pc: null,
       imageSrc: require('@/assets/logo.png'),
       videoSrc: null,
       inputText: '',
-      audioFiles: [],
-      audioUrl: '' // 新增字段用于存储 audio_file 的 url
     };
   },
   methods: {
     handleClick(option) {
       option.action();
     },
-    handleSubmit() {
-      this.audioFiles = [];
-      const payload = {
-        text: this.inputText
-      };
-      this.sendTextToBackend(payload);
-      this.$router.push('/console1'); // 添加跳转事件
+    toConsole() {
+      this.$router.push('/console1');
     },
     sendTextToBackend(payload) {
       console.log(payload);
       console.log(copywriting_generated_URL);
-      axios.post(copywriting_generated_URL, payload) // 使用配置文件中的服务地址
+      axios.post(copywriting_generated_URL, payload)
           .then(response => {
             console.log('Backend response:', response.data);
-            this.inputText = response.data.response_content; // 将返回的文案显示在文本框中
+            this.inputText = response.data.response_content;
           })
           .catch(error => {
             console.error('Error sending text to backend:', error);
           });
     },
-    sendVoiceToBackend() {
-      const toEndFile = {
+    sendMessage() {
+      console.log('Sending: ' + this.inputText);
+      console.log('session_id: ', this.sessionId);
+      axios.post(sendmessage_URL, {
         text: this.inputText,
-        custom_voice: 0,
-        prompt: "",
-        voice: "2222",
-        temperature: 0.3,
-        top_p: 0.7,
-        top_k: 20,
-        skip_refine: 0,
-        speed: 5,
-        text_seed: 42,
-        refine_max_new_token: 384,
-        infer_max_new_token: 2048,
-        wav: 0,
-        is_stream: 0
-      };
-      
-      axios.post(voice_generated_URL, toEndFile)
-        .then(response => {
-          console.log('Backend response:', response.data);
-          if (response.data.code === 0) {
-            this.audioFiles = response.data.audio_files;
-            this.audioUrl = response.data.audio_files[0].url; // 保存 audio_file 的 url
-          } else {
-            console.error('Error in backend response:', response.data.msg);
-          }
-        })
-        .catch(error => {
-          console.error('Error sending voice to backend:', error);
-        });
+        type: 'echo',
+        interrupt: true,
+        sessionid: parseInt(this.sessionId),
+      });
+      this.inputText = '';
     },
-    sendAudioFileToBackend() {
-      if (this.audioUrl) {
-        // 如果 audioUrl 不为空，发送 audioUrl 到后端
-        const formData = new FormData();
-        formData.append('audio_url', this.audioUrl);
-
-        axios.post(video_generated_URL, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+    negotiate() {
+      this.pc.addTransceiver('video', {direction: 'recvonly'});
+      this.pc.addTransceiver('audio', {direction: 'recvonly'});
+      return this.pc.createOffer().then((offer) => {
+        return this.pc.setLocalDescription(offer);
+      }).then(() => {
+        return new Promise((resolve) => {
+          if (this.pc.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            const checkState = () => {
+              if (this.pc.iceGatheringState === 'complete') {
+                this.pc.removeEventListener('icegatheringstatechange', checkState);
+                resolve();
+              }
+            };
+            this.pc.addEventListener('icegatheringstatechange', checkState);
           }
-        }).then(response => {
-          console.log('Audio URL sent successfully:', response);
-          this.videoSrc = video_play_URL + response.data['url'];
-          console.log(response);
-          console.log(video_play_URL);
-          console.log(this.videoSrc);
-        }).catch(error => {
-          console.error('Error sending audio URL to backend:', error);
         });
-      } else {
-        // 如果 audioUrl 为空，发送 1.mp3 到后端
-        const audioPath = require('@/assets/1.mp3');
-        const imagePath = require('@/assets/wrs.jpg');
-
-        Promise.all([
-          fetch(audioPath).then(response => response.blob()),
-          fetch(imagePath).then(response => response.blob())
-        ]).then(([audioBlob, imageBlob]) => {
-          const formData = new FormData();
-          formData.append('audio', new File([audioBlob], '1.mp3', {type: 'audio/mpeg'}));
-          formData.append('image', new File([imageBlob], 'wrs.jpg', {type: 'image/jpeg'}));
-
-          axios.post(video_generated_URL, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }).then(response => {
-            console.log('Audio and image sent successfully:', response);
-            this.videoSrc = video_play_URL + response.data['url'];
-            console.log(response);
-            console.log(video_play_URL);
-            console.log(this.videoSrc);
-          }).catch(error => {
-            console.error('Error sending audio and image:', error);
-          });
-        }).catch(error => {
-          console.error('Error fetching audio or image file:', error);
+      }).then(() => {
+        const offer = this.pc.localDescription;
+        return axios.post(offer_URL, {
+          sdp: offer.sdp,
+          type: offer.type,
         });
+      }).then((response) => {
+        this.sessionId = response.data.sessionid;
+        return this.pc.setRemoteDescription(response.data);
+      }).catch((e) => {
+        alert(e);
+      });
+    },
+    start() {
+      const config = {
+        sdpSemantics: 'unified-plan'
+      };
+
+      if (this.useStun) {
+        config.iceServers = [{urls: ['stun:stun.l.google.com:19302']}];
       }
-    }
+
+      this.pc = new RTCPeerConnection(config);
+
+      this.pc.addEventListener('track', (evt) => {
+        if (evt.track.kind === 'video') {
+          document.getElementById('video').srcObject = evt.streams[0];
+        } else {
+          document.getElementById('audio').srcObject = evt.streams[0];
+        }
+      });
+
+      this.started = true;
+      this.negotiate();
+    },
+    stop() {
+      this.started = false;
+      setTimeout(() => {
+        this.pc.close();
+      }, 500);
+    },
+    startDVanchor() {
+      axios.post(start_URL, {
+        username: 'user1'
+      }).then(() => {
+        this.dvAnchorStarted = true; // 更新状态变量
+      });
+    },
+    closeDVanchor() {
+      axios.post(close_URL, {
+        username: 'user1'
+      }).then(() => {
+        this.dvAnchorStarted = false; // 更新状态变量
+      });
+    },
   }
 };
 </script>
@@ -244,7 +248,7 @@ export default {
   border-radius: 5px;
   padding: 10px;
   cursor: pointer;
-  align-self: flex-end; /* 使提交按钮右对齐 */
+  /* align-self: flex-start;  使提交按钮左对齐 */
 }
 
 .submit-button:hover {

@@ -90,16 +90,9 @@ export default {
       started: false,
       sessionId: 0,
       message: '',
-      voiceOptions: ['2222', '7869', '6653', '4099', '5099', '随机'],
-      promptOptions: ['oral_2', 'laugh_0', 'break_6'],
-      speed: 3,
       textInput: '',
-      smallVideoUrl: '',
       largeVideoUrl: '',
       audioUrl: '', // 新增的 audioUrl 状态
-      selectedVoice: null,
-      selectedPrompt: null,
-      // 新增状态变量来跟踪按钮的当前状态
       dvAnchorStarted: false
     };
   },
@@ -563,13 +556,6 @@ textarea {
   font-size: 14px;
   color: #888;
   text-align: center;
-}
-
-.top-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 20px;
 }
 
 .text-input-container {
