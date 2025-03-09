@@ -10,8 +10,7 @@
         <div class="left-panel-wrapper">
           <div class="container video-container top large-video" @click="openFileInput('largeVideo')">
             <div class="video-display">
-              <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display" autoplay
-                     :poster="require('@/assets/loli.jpg')"></video>
+              <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display" autoplay></video>
               <span v-else class="upload-prompt">请上传视频</span>
             </div>
             <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="video/*"
@@ -193,8 +192,8 @@ export default {
     },
     submitVideoAndAudio() {
       const formData = new FormData();
-      formData.append('username', 'user1');
-      formData.append('text', '天生万物以养人，世人犹怨天不仁。');
+      formData.append('username', this.username);
+      formData.append('text', this.textInput);
       if (this.largeVideoUrl) {
         fetch(this.largeVideoUrl)
             .then(r => r.blob())
@@ -253,6 +252,9 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       }).then(response => {
+        if (response.status === 200) {
+          alert('上传成功，正在火速创造数字人中...');
+        }
         console.log('Upload success:', response.data);
       }).catch(error => {
         console.error('Upload error:', error);
@@ -260,14 +262,14 @@ export default {
     },
     startDVanchor() {
       axios.post(start_URL, {
-        username: 'user1'
+        username: this.username
       }).then(() => {
         this.dvAnchorStarted = true; // 更新状态变量
       });
     },
     closeDVanchor() {
       axios.post(close_URL, {
-        username: 'user1'
+        username: this.username
       }).then(() => {
         this.dvAnchorStarted = false; // 更新状态变量
       });
@@ -376,13 +378,14 @@ export default {
 }
 
 .container {
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* 修改为10px，减小缝隙 */
 }
 
 .container.audio-container {
-  padding: 20px;
+  padding: 10px;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 10px; /* 添加此行，减小音频和文本框之间的缝隙 */
 }
 
 .container.speed-container input[type="range"] {
@@ -459,11 +462,13 @@ textarea {
   flex-direction: row;
   width: 100%;
   gap: 20px;
+
 }
 
 .audio-display-container {
   width: 100%;
-  border-radius: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .audio-button-container {
@@ -550,7 +555,7 @@ textarea {
 
 .text-container {
   width: 100%;
-  height: 100%;
+  height: 80%;
   padding: 10px;
   box-sizing: border-box;
 }
