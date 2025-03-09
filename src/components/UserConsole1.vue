@@ -308,8 +308,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
-  color: white;
+  background-color: #7fddff;
+  color: black;
+  border: 2px solid white; /* 添加边框 */
+  border-radius: 5px; /* 可选：添加圆角 */
   padding: 10px 20px;
   font-size: 18px;
 }

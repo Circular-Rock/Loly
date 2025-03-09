@@ -231,8 +231,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
-  color: white;
+  background-color: #7fddff;
+  color: black;
+  border: 2px solid #ccc; /* 添加边框 */
+  border-radius: 5px; /* 可选：添加圆角 */
   padding: 10px 20px;
   font-size: 18px;
 }
@@ -283,7 +285,7 @@ export default {
   margin-bottom: 10px;
   cursor: pointer;
   width: 100%;
-  text-align: left;
+  text-align: center;
 }
 
 .sidebar-button:hover {
@@ -339,7 +341,7 @@ export default {
 
 .video-container {
   flex: 1; /* 使视频容器占据剩余空间 */
-  width: 80%; /* 使视频容器在水平方向上也占满可用空间 */
+  width: 90%; /* 使视频容器在水平方向上也占满可用空间 */
   display: flex;
   justify-content: center;
   align-items: center;
