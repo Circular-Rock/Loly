@@ -3,7 +3,14 @@
     <!-- 添加顶部菜单栏 -->
     <div class="top-menu">
       <div class="menu-left">数字主播系统</div>
-      <div class="menu-right">{{ username }}</div>
+      <div class="menu-right" @click="toggleUserMenu">
+        {{ username }}
+        <div v-if="showUserMenu" class="dropdown-menu">
+          <div class="dropdown-item" @click="goToProfile">个人信息</div>
+          <div class="dropdown-item" @click="goToHomePage">前往控制台</div>
+          <div class="dropdown-item" @click="goToLogin">登录界面</div>
+        </div>
+      </div>
     </div>
     <div class="content-wrapper">
       <div class="sidebar">
@@ -21,7 +28,8 @@
       </div>
       <div class="main-content">
         <div class="video-container top large-video">
-          <video id="video" controls class="video-display" autoplay :poster="require('@/assets/loli.jpg')" style="width: 100%; height: 500px;"></video>
+          <video id="video" controls class="video-display" autoplay :poster="require('@/assets/loli.jpg')"
+                 style="width: 100%; height: 500px;"></video>
         </div>
         <div class="audio-player-container">
           <div class="audio-display">
@@ -81,6 +89,7 @@ export default {
       inputText: '',
       dvAnchorStarted: false,
       liveStarted: false, // 添加状态变量
+      showUserMenu: false
     };
   },
   setup() {
@@ -198,7 +207,7 @@ export default {
     },
     startDVanchor() {
       axios.post(start_URL, {
-        username: 'user1'
+        username: this.username
       }).then(() => {
         this.dvAnchorStarted = true; // 更新状态变量
         this.options[2].disabled = true; // 禁用启动数字人按钮
@@ -212,7 +221,7 @@ export default {
         return;
       }
       axios.post(close_URL, {
-        username: 'user1'
+        username: this.username
       }).then(() => {
         this.dvAnchorStarted = false; // 更新状态变量
         this.options[2].disabled = false; // 启用启动数字人按钮
@@ -220,6 +229,18 @@ export default {
         this.options[4].disabled = true; // 禁用开启直播按钮
       });
     },
+    toggleUserMenu() {
+      this.showUserMenu = !this.showUserMenu; // 切换下拉菜单的显示状态
+    },
+    goToProfile() {
+      this.$router.push('/profile'); // 假设个人信息页面的路由为 /profile
+    },
+    goToHomePage() {
+      this.$router.push('/Console1'); // 假设主页面的路由为 /
+    },
+    goToLogin() {
+      this.$router.push('/UserLogin'); // 假设登录页面的路由为 /login
+    }
   }
 };
 </script>
@@ -244,6 +265,29 @@ export default {
 
 .menu-right {
   font-style: italic;
+  position: relative; /* 添加相对定位 */
+  cursor: pointer; /* 添加鼠标指针样式 */
+}
+
+.dropdown-menu {
+  position: absolute; /* 绝对定位 */
+  top: 100%; /* 菜单显示在用户名下方 */
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-item {
+  padding: 10px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.dropdown-item:hover {
+  background-color: lightblue;
 }
 
 .container {
