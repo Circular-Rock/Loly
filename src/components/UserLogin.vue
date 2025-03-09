@@ -56,7 +56,8 @@ export default {
       axios.post('http://localhost:5000/login', {
         username: this.username,
         password: this.password
-      }).then(response => {
+      }, { withCredentials: true }) // 确保携带会话信息
+        .then(response => {
           this.serverMessage = response.data.message;
           this.serverMessageType = response.data.status === 'success' ? 'success' : 'error';
           if (response.data.status === 'success') {
@@ -86,7 +87,7 @@ export default {
       axios.post('http://localhost:5000/register', {
         username: this.username,
         password: this.password
-      })
+      }, { withCredentials: true }) // 确保携带会话信息
       .then(response => {
         this.serverMessage = response.data.message;
         if (response.data.status === 'success') {

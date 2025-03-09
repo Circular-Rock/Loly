@@ -41,7 +41,7 @@
           <div class="inner-container audio-wrapper">
             <div class="audio-display-container">
               <div class="audio-display">
-                <audio id="audio" controls></audio>
+                <audio id="audio"></audio>
               </div>
             </div>
           </div>

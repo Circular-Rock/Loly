@@ -89,7 +89,7 @@ export default {
     sendTextToBackend(payload) {
       console.log(payload);
       console.log(copywriting_generated_URL);
-      axios.post(copywriting_generated_URL, payload)
+      axios.post(copywriting_generated_URL, payload, { withCredentials: true }) // 确保携带会话信息
           .then(response => {
             console.log('Backend response:', response.data);
             this.inputText = response.data.response_content;
@@ -106,7 +106,7 @@ export default {
         type: 'echo',
         interrupt: true,
         sessionid: parseInt(this.sessionId),
-      });
+      }, { withCredentials: true }); // 确保携带会话信息
       this.inputText = '';
     },
     negotiate() {

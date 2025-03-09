@@ -1,21 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import UserRegister from '../components/UserRegister.vue';
 import UserLogin from '../components/UserLogin.vue';
 import NotFound from "../components/NotFound.vue";
 import ImageDisplay from "../components/ImageDisplay.vue";
 import UserConsole from "../components/UserConsole.vue";
-import WebRTCComponent from "../components/WebRTCComponent.vue";
 import UserConsole1 from "../components/UserConsole1.vue";
 
    const routes = [
      {
        path: '/',
        redirect: '/UserLogin'
-     },
-     {
-       path: '/UserRegister',
-       name: 'UserRegister',
-       component: UserRegister
      },
      {
        path: '/ImageDisplay',
@@ -36,11 +29,6 @@ import UserConsole1 from "../components/UserConsole1.vue";
        path: '/console1',
        name: 'UserConsole1',
        component: UserConsole1
-     },
-     {
-       path: '/webrtc',
-       name: 'WebRTCComponent',
-       component: WebRTCComponent
      },
      {
        path: '/:pathMatch(.*)*',
