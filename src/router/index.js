@@ -10,10 +10,10 @@ import UserConsole1 from "../components/UserConsole1.vue";
    const routes = [
      {
        path: '/',
-       redirect: '/console'
+       redirect: '/UserLogin'
      },
      {
-       path: '/register',
+       path: '/UserRegister',
        name: 'UserRegister',
        component: UserRegister
      },
@@ -23,8 +23,8 @@ import UserConsole1 from "../components/UserConsole1.vue";
        component: ImageDisplay
      },
      {
-       path: '/login',
-       name: 'UserRegister',
+       path: '/Userlogin',
+       name: 'UserLogin',
        component: UserLogin
      },
      {

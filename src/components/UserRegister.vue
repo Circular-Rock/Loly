@@ -1,6 +1,7 @@
 <template>
   <div class="register-container">
     <div class="login-box">
+      <h2 class="project-title">虚拟数字主播</h2>
       <input v-model="username" type="text" placeholder="用户名" class="login-input" />
       <input v-model="password" type="password" placeholder="密码" class="login-input" />
       <input v-model="confirmPassword" type="password" placeholder="重复密码" class="login-input" />
@@ -72,7 +73,7 @@ export default {
       });
     },
     login() {
-      this.router.push('/UserRegister');
+      this.router.push('/UserLogin');
       console.log('Login button clicked');
     }
   }
