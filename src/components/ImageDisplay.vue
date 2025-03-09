@@ -1,27 +1,33 @@
 <template>
   <div class="container">
-    <div class="sidebar">
-      <div class="button-section">
-        <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button" :disabled="option.disabled">
-          {{ option.label }}
-        </button>
-        <button @click="toConsole" class="submit-button">控制台</button>
-      </div>
-      <div class="input-section">
-        <textarea v-model="inputText" placeholder="Enter text here" class="input-textarea"></textarea>
-        <!-- <button @click="handleSubmit" class="submit-button">控制台</button>  修改提交按钮文本 -->
-      </div>
+    <!-- 添加顶部菜单栏 -->
+    <div class="top-menu">
+      <div class="menu-left">数字主播系统</div>
+      <div class="menu-right">{{ username }}</div>
     </div>
-    <div class="main-content">
-      <div class="video-container">
-        <div class="video-container top large-video">
-          <video id="video" controls class="video-display" autoplay ></video>
+    <div class="content-wrapper">
+      <div class="sidebar">
+        <div class="button-section">
+          <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button" :disabled="option.disabled">
+            {{ option.label }}
+          </button>
+          <button @click="toConsole" class="submit-button">控制台</button>
+        </div>
+        <div class="input-section">
+          <textarea v-model="inputText" placeholder="Enter text here" class="input-textarea"></textarea>
+          <!-- <button @click="handleSubmit" class="submit-button">控制台</button>  修改提交按钮文本 -->
         </div>
       </div>
-      <div class="audio-player-container">
-        <div class="audio-display">
-<!--          <audio id="audio" controls autoplay></audio>-->
-          <audio id="audio" autoplay></audio>
+      <div class="main-content">
+        <div class="video-container">
+          <div class="video-container top large-video">
+            <video id="video" controls class="video-display" autoplay ></video>
+          </div>
+        </div>
+        <div class="audio-player-container">
+          <div class="audio-display">
+            <audio id="audio" autoplay></audio>
+          </div>
         </div>
       </div>
     </div>
@@ -33,6 +39,7 @@ import axios from 'axios'; // 引入 axios
 import {sendmessage_URL} from '@/router/config.js';
 import {copywriting_generated_URL} from '@/router/config.js';
 import {offer_URL, start_URL, close_URL} from "@/router/config";
+import { useStore } from 'vuex'; // 引入 useStore
 
 export default {
   data() {
@@ -76,6 +83,15 @@ export default {
       dvAnchorStarted: false,
       liveStarted: false, // 添加状态变量
     };
+  },
+  setup() {
+    const store = useStore(); // 初始化 store
+    return { store };
+  },
+  computed: {
+    username() {
+      return this.store.state.username; // 从 Vuex store 获取用户名
+    },
   },
   methods: {
     handleClick(option) {
@@ -210,9 +226,34 @@ export default {
 </script>
 
 <style scoped>
+/* 添加顶部菜单栏样式 */
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+}
+
+.menu-left {
+  font-weight: bold;
+}
+
+.menu-right {
+  font-style: italic;
+}
+
 .container {
   display: flex;
-  height: 100vh;
+  flex-direction: column; /* 修改为垂直方向的flex布局 */
+  height: calc(100vh - 50px); /* 减去顶部菜单栏的高度 */
+}
+
+.content-wrapper {
+  display: flex;
+  flex: 1;
 }
 
 .sidebar {
@@ -298,22 +339,12 @@ export default {
 
 .video-container {
   flex: 1; /* 使视频容器占据剩余空间 */
-  width: 60%; /* 使视频容器在水平方向上也占满可用空间 */
+  width: 80%; /* 使视频容器在水平方向上也占满可用空间 */
   display: flex;
   justify-content: center;
   align-items: center;
   border: 2px solid #ccc; /* 添加边框 */
   border-radius: 5px; /* 可选：添加圆角 */
-}
-
-.display-video {
-  width: 100%;
-  height: 100%
-}
-
-.display-image {
-  max-width: 100%;
-  max-height: 100%;
 }
 
 .audio-player-container {

@@ -25,9 +25,15 @@
 <script>
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex'; // 引入 useStore
 
 export default {
   name: 'UserLogin',
+  setup() {
+    const router = useRouter();
+    const store = useStore(); // 初始化 store
+    return { router, store }; // 确保 store 返回
+  },
   data() {
     return {
       username: '',
@@ -39,10 +45,6 @@ export default {
       serverMessageType: '',
       isRegister: false
     };
-  },
-  setup() {
-    const router = useRouter(); // 初始化 router
-    return { router };
   },
   methods: {
     login() {
@@ -61,7 +63,9 @@ export default {
           this.serverMessage = response.data.message;
           this.serverMessageType = response.data.status === 'success' ? 'success' : 'error';
           if (response.data.status === 'success') {
+            this.store.dispatch('setUsername', this.username); // 存储用户名到 Vuex store
             this.router.push('/ImageDisplay');
+            console.log('Session ID:', response.data.session_id);  // 打印 sessionid
           }
         })
         .catch(error => {

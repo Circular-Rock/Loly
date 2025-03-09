@@ -1,72 +1,79 @@
 <template>
   <div class="console-container">
-    <div class="left-panel">
-      <div class="left-panel-wrapper">
-        <div class="container video-container top large-video" @click="openFileInput('largeVideo')">
-          <div class="video-display">
-            <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display"></video>
-            <span v-else class="upload-prompt">请上传视频</span>
-          </div>
-          <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="video/*"
-                 style="display: none;"/>
-        </div>
-        <div class="container audio-container">
-          <div class="audio-wrapper">
-            <div class="audio-display-container">
-              <div class="audio-display" @click="openFileInput('audio')">
-                <audio v-if="audioUrl" :src="audioUrl" controls></audio>
-                <span v-else class="upload-prompt">请上传音频</span>
-              </div>
-              <input type="file" ref="audioFileInput" @change="handleAudioChange()" accept="audio/*"
-                     style="display: none;"/>
+    <!-- 添加顶部菜单栏 -->
+    <div class="top-menu">
+      <div class="menu-left">数字主播系统</div>
+      <div class="menu-right">{{ username }}</div>
+    </div>
+    <div class="content-wrapper"> <!-- 新增的内容容器 -->
+      <div class="left-panel">
+        <div class="left-panel-wrapper">
+          <div class="container video-container top large-video" @click="openFileInput('largeVideo')">
+            <div class="video-display">
+              <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display"></video>
+              <span v-else class="upload-prompt">请上传视频</span>
             </div>
-            <div class="audio-button-container">
-              <div class="audio-button">
-                <button @click="submitVideoAndAudio">提交</button>
+            <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="video/*"
+                   style="display: none;"/>
+          </div>
+          <div class="container audio-container">
+            <div class="audio-wrapper">
+              <div class="audio-display-container">
+                <div class="audio-display" @click="openFileInput('audio')">
+                  <audio v-if="audioUrl" :src="audioUrl" controls></audio>
+                  <span v-else class="upload-prompt">请上传音频</span>
+                </div>
+                <input type="file" ref="audioFileInput" @change="handleAudioChange()" accept="audio/*"
+                       style="display: none;"/>
+              </div>
+              <div class="audio-button-container">
+                <div class="audio-button">
+                  <button @click="submitVideoAndAudio">提交</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="text-input-container">
-          <input type="text" v-model="textInput" placeholder="输入文本" class="square-input"/>
+          <div class="text-input-container">
+            <input type="text" v-model="textInput" placeholder="输入文本" class="square-input"/>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="right-panel">
-      <div class="right-panel-wrapper">
-        <div class="video-container top large-video">
-          <video id="video" controls class="video-display"></video>
-        </div>
-        <div class="container audio-container"> <!-- 新增的声音展示容器 -->
-          <div class="inner-container audio-wrapper">
-            <div class="audio-display-container">
-              <div class="audio-display">
-                <audio id="audio"></audio>
+      <div class="right-panel">
+        <div class="right-panel-wrapper">
+          <div class="video-container top large-video">
+            <video id="video" controls class="video-display"></video>
+          </div>
+          <div class="container audio-container"> <!-- 新增的声音展示容器 -->
+            <div class="inner-container audio-wrapper">
+              <div class="audio-display-container">
+                <div class="audio-display">
+                  <audio id="audio"></audio>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="bottom-container">
-          <div class="split-container">
-            <div class="text-container">
-              <div class="inline-container">
-                <textarea v-model="message" placeholder="输入文本"></textarea>
-              </div>
-              <div class="button-container">
-                <div class="button-wrapper">
-                  <button @click="start" :disabled="started">Start</button>
+          <div class="bottom-container">
+            <div class="split-container">
+              <div class="text-container">
+                <div class="inline-container">
+                  <textarea v-model="message" placeholder="输入文本"></textarea>
                 </div>
-                <div class="button-wrapper">
-                  <button @click="stop" :disabled="!started">Stop</button>
-                </div>
-                <div class="button-wrapper">
-                  <button @click="toggleDVanchor">{{ dvAnchorButtonText }}</button>
-                </div>
-                <div class="button-wrapper">
-                  <button @click="sendMessage">sendMessage</button>
-                </div>
-                <div class="button-wrapper">
-                  <button @click="useAnchor">使用主播</button>
+                <div class="button-container">
+                  <div class="button-wrapper">
+                    <button @click="start" :disabled="started">Start</button>
+                  </div>
+                  <div class="button-wrapper">
+                    <button @click="stop" :disabled="!started">Stop</button>
+                  </div>
+                  <div class="button-wrapper">
+                    <button @click="toggleDVanchor">{{ dvAnchorButtonText }}</button>
+                  </div>
+                  <div class="button-wrapper">
+                    <button @click="sendMessage">sendMessage</button>
+                  </div>
+                  <div class="button-wrapper">
+                    <button @click="useAnchor">使用主播</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -80,9 +87,14 @@
 <script>
 import axios from 'axios';
 import {offer_URL, sendmessage_URL, start_URL, upload_URL, close_URL} from "@/router/config";
+import { useStore } from 'vuex'; // 引入 useStore
 
 export default {
   name: 'UserConsole1',
+  setup() {
+    const store = useStore(); // 初始化 store
+    return { store };
+  },
   data() {
     return {
       pc: null,
@@ -97,6 +109,9 @@ export default {
     };
   },
   computed: {
+    username() {
+      return this.store.state.username; // 从 Vuex store 获取用户名
+    },
     // 计算属性来动态设置按钮文本
     dvAnchorButtonText() {
       return this.dvAnchorStarted ? 'Close DV Anchor' : 'Start DV Anchor';
@@ -288,10 +303,34 @@ export default {
 </script>
 
 <style scoped>
+/* 添加顶部菜单栏样式 */
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  font-size: 18px;
+}
+
+.menu-left {
+  font-weight: bold;
+}
+
+.menu-right {
+  font-style: italic;
+}
+
 .console-container {
   display: flex;
-  flex-direction: row;
-  height: 100vh;
+  flex-direction: column; /* 修改为垂直方向的flex布局 */
+  height: calc(100vh - 50px); /* 减去顶部菜单栏的高度 */
+}
+
+.content-wrapper {
+  display: flex;
+  flex: 1;
 }
 
 .left-panel {

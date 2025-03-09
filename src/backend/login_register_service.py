@@ -40,10 +40,10 @@ def handle_login_request(request):
         return jsonify({'status': 'error', 'message': '用户不存在'}), 400
 
     user = search_users(user_name=username, user_password=password)
-    if not user:
-        return jsonify({'status': 'error', 'message': '密码错误'}), 400
-
-    # 设置会话信息
-    session['user_id'] = user[0][0]
-    session['username'] = username
-    return jsonify({'status': 'success', 'message': '登录成功', 'user_id': str(user[0][0])}), 200
+    if user :
+        session['user_id'] = user[0][0]
+        session_id = session.sid  # 获取 sessionid
+        print(f"Session ID: {session_id}")  # 打印 sessionid
+        return jsonify({'status': 'success', 'message': '登录成功', 'session_id': session_id})  # 返回 sessionid
+    else:
+        return jsonify({'status': 'error', 'message': '用户名或密码错误'})
