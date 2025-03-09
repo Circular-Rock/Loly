@@ -4,10 +4,11 @@ from src.backend.login_register_service import handle_register_request, handle_l
 from src.backend.redis_config import configure_redis_session  # 修改导入路径
 
 app = Flask(__name__)
-CORS(app)  # 允许所有来源的跨域请求
 
 # 调用配置函数
 configure_redis_session(app)
+
+CORS(app,supports_credentials=True)  # 允许所有来源的跨域请求
 
 @app.route('/')
 def home():
