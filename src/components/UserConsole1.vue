@@ -10,7 +10,8 @@
         <div class="left-panel-wrapper">
           <div class="container video-container top large-video" @click="openFileInput('largeVideo')">
             <div class="video-display">
-              <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display"></video>
+              <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display" autoplay
+                     :poster="require('@/assets/loli.jpg')"></video>
               <span v-else class="upload-prompt">请上传视频</span>
             </div>
             <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="video/*"
@@ -41,7 +42,8 @@
       <div class="right-panel">
         <div class="right-panel-wrapper">
           <div class="video-container top large-video">
-            <video id="video" controls class="video-display"></video>
+            <video id="video" controls class="video-display" autoplay :poster="require('@/assets/loli.jpg')"
+                   style="width: 100%; height: 500px;"></video>
           </div>
           <div class="container audio-container"> <!-- 新增的声音展示容器 -->
             <div class="inner-container audio-wrapper">
@@ -87,13 +89,13 @@
 <script>
 import axios from 'axios';
 import {offer_URL, sendmessage_URL, start_URL, upload_URL, close_URL} from "@/router/config";
-import { useStore } from 'vuex'; // 引入 useStore
+import {useStore} from 'vuex'; // 引入 useStore
 
 export default {
   name: 'UserConsole1',
   setup() {
     const store = useStore(); // 初始化 store
-    return { store };
+    return {store};
   },
   data() {
     return {

@@ -8,7 +8,8 @@
     <div class="content-wrapper">
       <div class="sidebar">
         <div class="button-section">
-          <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button" :disabled="option.disabled">
+          <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button"
+                  :disabled="option.disabled">
             {{ option.label }}
           </button>
           <button @click="toConsole" class="submit-button">控制台</button>
@@ -19,10 +20,8 @@
         </div>
       </div>
       <div class="main-content">
-        <div class="video-container">
-          <div class="video-container top large-video">
-            <video id="video" controls class="video-display" autoplay ></video>
-          </div>
+        <div class="video-container top large-video">
+          <video id="video" controls class="video-display" autoplay :poster="require('@/assets/loli.jpg')" style="width: 100%; height: 500px;"></video>
         </div>
         <div class="audio-player-container">
           <div class="audio-display">
@@ -39,7 +38,7 @@ import axios from 'axios'; // 引入 axios
 import {sendmessage_URL} from '@/router/config.js';
 import {copywriting_generated_URL} from '@/router/config.js';
 import {offer_URL, start_URL, close_URL} from "@/router/config";
-import { useStore } from 'vuex'; // 引入 useStore
+import {useStore} from 'vuex'; // 引入 useStore
 
 export default {
   data() {
@@ -86,7 +85,7 @@ export default {
   },
   setup() {
     const store = useStore(); // 初始化 store
-    return { store };
+    return {store};
   },
   computed: {
     username() {
@@ -105,7 +104,7 @@ export default {
     sendTextToBackend(payload) {
       console.log(payload);
       console.log(copywriting_generated_URL);
-      axios.post(copywriting_generated_URL, payload, { withCredentials: true }) // 确保携带会话信息
+      axios.post(copywriting_generated_URL, payload, {withCredentials: true}) // 确保携带会话信息
           .then(response => {
             console.log('Backend response:', response.data);
             this.inputText = response.data.response_content;
@@ -122,7 +121,7 @@ export default {
         type: 'echo',
         interrupt: true,
         sessionid: parseInt(this.sessionId),
-      }, { withCredentials: true }); // 确保携带会话信息
+      }, {withCredentials: true}); // 确保携带会话信息
       this.inputText = '';
     },
     negotiate() {
@@ -260,7 +259,7 @@ export default {
 
 .sidebar {
   width: 200px;
-  background-color: #f4f4f4;
+  background-color: lightcyan;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -337,6 +336,7 @@ export default {
   align-items: center;
   justify-content: center; /* 使内容在容器内居中对齐 */
   padding: 20px;
+  background-color: #f085ff;
 }
 
 .video-container {
@@ -347,6 +347,7 @@ export default {
   align-items: center;
   border: 2px solid #ccc; /* 添加边框 */
   border-radius: 5px; /* 可选：添加圆角 */
+  background-color: white;
 }
 
 .audio-player-container {
