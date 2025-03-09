@@ -15,12 +15,13 @@
     <div class="main-content">
       <div class="video-container">
         <div class="video-container top large-video">
-          <video id="video" controls class="video-display" autoplay></video>
+          <video id="video" controls class="video-display" autoplay ></video>
         </div>
       </div>
       <div class="audio-player-container">
         <div class="audio-display">
-          <audio id="audio" controls autoplay></audio>
+<!--          <audio id="audio" controls autoplay></audio>-->
+          <audio id="audio" autoplay></audio>
         </div>
       </div>
     </div>
