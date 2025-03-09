@@ -1,16 +1,22 @@
 <template>
-  <div class="login-container">
+  <div class="login-container" :class="{'slide-right': isRegister}">
     <div class="image-box">
       <img src="@/assets/loli.jpg" alt="Loli Image" class="loli-image"/>
     </div>
-    <div class="login-box">
+    <div class="login-box" :class="{'slide-left': isRegister}">
       <h2 class="project-title">虚拟数字主播</h2>
-      <input v-model="username" type="text" placeholder="用户名" class="login-input"/>
-      <input v-model="password" type="password" placeholder="密码" class="login-input"/>
+      <input v-if="!isRegister" v-model="username" type="text" placeholder="用户名" class="login-input"/>
+      <input v-if="!isRegister" v-model="password" type="password" placeholder="密码" class="login-input"/>
+      <input v-if="isRegister" v-model="username" type="text" placeholder="用户名" class="login-input"/>
+      <input v-if="isRegister" v-model="password" type="password" placeholder="密码" class="login-input"/>
+      <input v-if="isRegister" v-model="confirmPassword" type="password" placeholder="重复密码" class="login-input"/>
       <div class="button-container">
-        <button @click="login" class="login-button">登录</button>
-        <button @click="register" class="register-button">注册</button>
+        <button v-if="!isRegister" @click="login" class="login-button">登录</button>
+        <button v-if="isRegister" @click="register" class="register-button">注册</button>
+        <button @click="toggleForm" class="toggle-button">{{ isRegister ? '返回登录' : '注册' }}</button>
       </div>
+      <p v-if="passwordMismatch && isRegister" class="error-message">两次输入的密码不一致</p>
+      <p v-if="emptyFields" class="error-message">用户名和密码不能为空</p>
       <p v-if="serverMessage" :class="['server-message', serverMessageType]">{{ serverMessage }}</p>
     </div>
   </div>
@@ -18,7 +24,7 @@
 
 <script>
 import axios from 'axios';
-import {useRouter} from "vue-router";
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'UserLogin',
@@ -26,13 +32,17 @@ export default {
     return {
       username: '',
       password: '',
+      confirmPassword: '',
+      passwordMismatch: false,
+      emptyFields: false,
       serverMessage: '',
-      serverMessageType: ''
+      serverMessageType: '',
+      isRegister: false
     };
   },
   setup() {
     const router = useRouter(); // 初始化 router
-    return {router};
+    return { router };
   },
   methods: {
     login() {
@@ -58,8 +68,46 @@ export default {
         });
     },
     register() {
-      this.router.push('/UserRegister');
-      console.log('Register button clicked');
+      if (!this.username || !this.password) {
+        this.emptyFields = true;
+        this.serverMessage = '';
+        return;
+      }
+      if (this.password !== this.confirmPassword) {
+        this.passwordMismatch = true;
+        this.emptyFields = false;
+        this.serverMessage = '';
+        return;
+      }
+      this.passwordMismatch = false;
+      this.emptyFields = false;
+
+      // 发送注册信息到后端
+      axios.post('http://localhost:5000/register', {
+        username: this.username,
+        password: this.password
+      })
+      .then(response => {
+        this.serverMessage = response.data.message;
+        if (response.data.status === 'success') {
+          this.toggleForm();
+        }
+        console.log('注册成功:', response.data);
+      })
+      .catch(error => {
+        this.serverMessage = error.response.data.message;
+        console.error('注册失败:', error);
+      });
+    },
+    toggleForm() {
+      this.isRegister = !this.isRegister;
+      this.username = '';
+      this.password = '';
+      this.confirmPassword = '';
+      this.passwordMismatch = false;
+      this.emptyFields = false;
+      this.serverMessage = '';
+      this.serverMessageType = '';
     }
   }
 }
@@ -83,6 +131,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 100vh;
+  overflow: hidden;
+  position: relative;
 }
 
 .image-box {
@@ -91,6 +141,7 @@ export default {
   align-items: center;
   width: 50%;
   background-color: #f0f0f0; /* 可选：设置背景颜色 */
+  transition: transform 0.5s ease-in-out;
 }
 
 .loli-image {
@@ -112,6 +163,23 @@ export default {
   background-color: #fff;
   margin-top: auto;
   margin-bottom: auto;
+  transition: transform 0.5s ease-in-out;
+}
+
+.slide-right .image-box {
+  transform: translateX(100%);
+}
+
+.slide-right .login-box {
+  transform: translateX(-100%);
+}
+
+.slide-left .image-box {
+  transform: translateX(0);
+}
+
+.slide-left .login-box {
+  transform: translateX(0);
 }
 
 .project-title {
@@ -134,7 +202,7 @@ export default {
   width: 60%;
 }
 
-.login-button, .register-button {
+.login-button, .register-button, .toggle-button {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -157,6 +225,14 @@ export default {
 
 .register-button:hover {
   background-color: #007bb5;
+}
+
+.toggle-button {
+  background-color: #FF9800;
+}
+
+.toggle-button:hover {
+  background-color: #e68a00;
 }
 
 .error-message {
