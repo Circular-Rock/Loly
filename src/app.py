@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
+
+from src.backend.Text_Service import get_random_text
 from src.backend.login_register_service import handle_register_request, handle_login_request
 from src.backend.redis_config import configure_redis_session  # 修改导入路径
 
@@ -28,6 +30,11 @@ def register_user():
 @app.route('/login', methods=['POST'])
 def login_user():
     return handle_login_request(request)
+
+@app.route('/get_text', methods=['GET'])
+def get_text():
+    text = get_random_text()
+    return jsonify({'text': text, 'status': 'success'})
 
 if __name__ == '__main__':
     app.run(debug=True)

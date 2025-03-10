@@ -26,7 +26,9 @@
                      style="display: none;"/>
             </div>
             <div class="text-input-container">
-              <input type="text" v-model="textInput" placeholder="输入文本" class="square-input"/>
+              <div class="text-display" @click="fetchText" :class="{ 'text-clickable': !textInput }">
+                {{ textInput || '点击选择参考文本' }}
+              </div>
             </div>
           </div>
           <div class="container audio-container">
@@ -113,7 +115,7 @@ export default {
       started: false,
       sessionId: 0,
       message: '',
-      textInput: '',
+      textInput: '', // 文本内容
       largeVideoUrl: '',
       audioUrl: '', // 新增的 audioUrl 状态
       dvAnchorStarted: false,
@@ -248,7 +250,7 @@ export default {
     handleAudioChange() {
       const file = event.target.files[0];
       if (file) {
-        const allowedExtensions = /(\.wav)$/i;
+        const allowedExtensions = /(\.mp3)$/i;
         if (!allowedExtensions.exec(file.name)) {
           alert('请上传 mp3 格式的音频文件');
           this.$refs.audioFileInput.value = ''; // 清空文件输入
@@ -311,6 +313,15 @@ export default {
     },
     goToLogin() {
       this.$router.push('/UserLogin'); // 假设登录页面的路由为 /login
+    },
+    fetchText() {
+      axios.get('http://localhost:5000/get_text')
+        .then(response => {
+          this.textInput = response.data.text; // 假设返回的数据结构为 { text: '...' }
+        })
+        .catch(error => {
+          console.error('Error fetching text:', error);
+        });
     }
   },
   beforeUnmount() {
@@ -473,6 +484,7 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 .audio-button {
@@ -650,5 +662,22 @@ textarea {
   display: flex;
   width: 100%;
   height: 90%;
+}
+
+.text-display {
+  width: 97%;
+  height: 98%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.text-clickable {
+  background-color: white;
 }
 </style>
