@@ -15,13 +15,19 @@
     <div class="content-wrapper"> <!-- 新增的内容容器 -->
       <div class="left-panel">
         <div class="left-panel-wrapper">
-          <div class="container video-container top large-video" @click="openFileInput('largeVideo')">
-            <div class="video-display">
-              <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display" autoplay></video>
-              <span v-else class="upload-prompt">请上传视频</span>
+          <div class="parallel-video-text">
+            <div class="container video-container top large-video"
+                 @click="openFileInput('largeVideo')">
+              <div class="video-display">
+                <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display" autoplay></video>
+                <span v-else class="upload-prompt">请上传视频</span>
+              </div>
+              <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="video/*"
+                     style="display: none;"/>
             </div>
-            <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="video/*"
-                   style="display: none;"/>
+            <div class="text-input-container">
+              <input type="text" v-model="textInput" placeholder="输入文本" class="square-input"/>
+            </div>
           </div>
           <div class="container audio-container">
             <div class="audio-wrapper">
@@ -40,15 +46,12 @@
               </div>
             </div>
           </div>
-          <div class="text-input-container">
-            <input type="text" v-model="textInput" placeholder="输入文本" class="square-input"/>
-          </div>
         </div>
       </div>
       <div class="right-panel">
         <div class="right-panel-wrapper">
-          <div class="video-container top large-video">
-            <video id="video"  class="video-display" autoplay :poster="require('@/assets/loli.png')"
+          <div class="video-container-right top large-video">
+            <video id="video" class="video-display-right" autoplay :poster="require('@/assets/loli.png')"
                    style="width: 100%; height: 500px;"></video>
           </div>
           <div class="container audio-container"> <!-- 新增的声音展示容器 -->
@@ -284,7 +287,7 @@ export default {
         username: this.username
       }).then(() => {
         this.dvAnchorStarted = false; // 更新状态变量
-          console.log('Close DV anchor');
+        console.log('Close DV anchor');
       });
     },
     toggleDVanchor() {
@@ -311,7 +314,7 @@ export default {
     }
   },
   beforeUnmount() {
-    this.closeDVanchor(); // 在组件卸载前调用 closeDVanchor 方法
+    //this.closeDVanchor(); // 在组件卸载前调用 closeDVanchor 方法
   },
   mounted() {
     window.onunload = () => {
@@ -429,7 +432,7 @@ export default {
 }
 
 .container {
-  margin-bottom: 10px; /* 修改为10px，减小缝隙 */
+  margin-bottom: 10px;
 }
 
 .container.audio-container {
@@ -437,69 +440,6 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px; /* 添加此行，减小音频和文本框之间的缝隙 */
-}
-
-.container.speed-container input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 8px;
-  background: #ddd;
-  border-radius: 5px;
-  outline: none;
-  transition: background 0.2s;
-}
-
-.container.speed-container input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #007bff;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.container.speed-container input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: #007bff;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.container.speed-container input[type="range"]:hover {
-  background: #ccc;
-}
-
-.container.speed-container input[type="range"]:hover::-webkit-slider-thumb {
-  background: #0056b3;
-}
-
-.container.speed-container input[type="range"]:hover::-moz-range-thumb {
-  background: #0056b3;
-}
-
-.container.speed-container span {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #333;
-}
-
-.button-group.voice-button-group button {
-  padding: 10px 40px;
-  flex: 0 0 30%;
-}
-
-.button-group.prompt-button-group button {
-  padding: 10px 20px;
-  flex: 1;
-}
-
-.button-group button {
-  padding: 10px 40px;
-  flex: 0 0 30%;
 }
 
 textarea {
@@ -558,7 +498,7 @@ textarea {
   color: white;
 }
 
-.video-container {
+.video-container-right {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
@@ -566,14 +506,14 @@ textarea {
   border-radius: 10px;
 }
 
-.video-container.top {
+.video-container-right.top {
   height: 70%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.video-container.top.large-video {
+.video-container-right.top.large-video {
   height: 70%;
 }
 
@@ -599,6 +539,12 @@ textarea {
 }
 
 .video-display {
+  max-width: 200px;
+  max-height: 400px;
+  border-radius: 10px;
+}
+
+.video-display-right {
   max-width: 400px;
   max-height: 400px;
   border-radius: 10px;
@@ -657,22 +603,52 @@ textarea {
   text-align: center;
 }
 
+.video-container {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.video-container.top {
+  height: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-container.top.large-video {
+  height: 100%;
+  width: 50%;
+  justify-content: center;;
+}
+
 .text-input-container {
-  margin-top: 10px;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 10px;
 }
 
 .text-input-container input[type="text"] {
-  width: 95%;
-  padding: 10px;
+  width: 97%;
+  height: 98%;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
 .square-input {
   width: 100%;
-  height: 40px; /* 设置高度以使其成为方块形 */
-  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+.parallel-video-text {
+  display: flex;
+  width: 100%;
+  height: 90%;
 }
 </style>
