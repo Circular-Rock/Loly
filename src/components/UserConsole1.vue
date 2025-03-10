@@ -48,7 +48,7 @@
       <div class="right-panel">
         <div class="right-panel-wrapper">
           <div class="video-container top large-video">
-            <video id="video" controls class="video-display" autoplay :poster="require('@/assets/loli.png')"
+            <video id="video"  class="video-display" autoplay :poster="require('@/assets/loli.png')"
                    style="width: 100%; height: 500px;"></video>
           </div>
           <div class="container audio-container"> <!-- 新增的声音展示容器 -->
