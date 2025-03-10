@@ -138,6 +138,7 @@ export default {
   height: 100vh;
   overflow: hidden;
   position: relative;
+  background-color: white;
 }
 
 .image-box {
@@ -145,7 +146,7 @@ export default {
   justify-content: center;
   align-items: center;
   width: 50%;
-  background-color: #f0f0f0; /* 可选：设置背景颜色 */
+  background-color: white; /* 可选：设置背景颜色 */
   transition: transform 0.5s ease-in-out;
 }
 
