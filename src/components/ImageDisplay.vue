@@ -18,6 +18,8 @@
           <button v-for="(option, index) in options" :key="index" @click="handleClick(option)" class="sidebar-button"
                   :disabled="option.disabled">
             {{ option.label }}
+            <span v-if="option.label === '提交商品信息' && tooltipMessage" class="tooltip">{{ tooltipMessage }}</span>
+            <span v-if="option.label === '将文案发送到后端' && tooltipMessageTwo" class="tooltip">{{ tooltipMessageTwo }}</span>
           </button>
           <button @click="toConsole" class="submit-button">控制台</button>
         </div>
@@ -28,7 +30,7 @@
       </div>
       <div class="main-content">
         <div class="video-container top large-video">
-          <video id="video" controls class="video-display" autoplay :poster="require('@/assets/loli.jpg')"
+          <video id="video" class="video-display" autoplay :poster="require('@/assets/loli.png')"
                  style="width: 100%; height: 500px;"></video>
         </div>
         <div class="audio-player-container">
@@ -60,7 +62,7 @@ export default {
         {
           label: '将文案发送到后端', action: () => {
             this.sendMessage();
-          }
+          }, disabled: true
         },
         {
           label: '启动数字人', action: () => {
@@ -89,7 +91,9 @@ export default {
       inputText: '',
       dvAnchorStarted: false,
       liveStarted: false, // 添加状态变量
-      showUserMenu: false
+      showUserMenu: false,
+      tooltipMessage: '', // 添加提示信息变量
+      tooltipMessageTwo: ''
     };
   },
   setup() {
@@ -113,24 +117,43 @@ export default {
     sendTextToBackend(payload) {
       console.log(payload);
       console.log(copywriting_generated_URL);
+      this.options[0].disabled = true;
+      this.tooltipMessage = '商品信息已提交,正在火速生成文案'; // 更新提示信息
       axios.post(copywriting_generated_URL, payload, {withCredentials: true}) // 确保携带会话信息
           .then(response => {
             console.log('Backend response:', response.data);
             this.inputText = response.data.response_content;
+            this.options[0].disabled = false;
+            this.options[1].disabled = false;
+            this.tooltipMessage = ''; // 清空提示信息
           })
           .catch(error => {
             console.error('Error sending text to backend:', error);
+            this.tooltipMessage = ''; // 清空提示信息
           });
     },
     sendMessage() {
       console.log('Sending: ' + this.inputText);
       console.log('session_id: ', this.sessionId);
+      this.options[1].disabled = true;
+      this.tooltipMessageTwo = '文案已提交，请等待'; // 使用 tooltipMessageTwo 显示气泡信息
       axios.post(sendmessage_URL, {
         text: this.inputText,
         type: 'echo',
         interrupt: true,
         sessionid: parseInt(this.sessionId),
-      }, {withCredentials: true}); // 确保携带会话信息
+      }, {withCredentials: true}).then((response) => {
+        console.log('Backend response:', response.data);
+        this.options[1].disabled = false;
+        this.tooltipMessageTwo = ''; // 清空提示信息
+      }).catch((error) => {
+        if (error.response && error.response.status === 500) {
+            this.tooltipMessageTwo = '请先启动数字人'; // 使用 tooltipMessageTwo 显示气泡信息
+        } else {
+            console.error('Error sending text to backend:', error);
+            this.tooltipMessageTwo = ''; // 清空提示信息
+        }
+      }); // 确保携带会话信息
       this.inputText = '';
     },
     negotiate() {
@@ -251,7 +274,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #7fddff;
+  background-color: rgba(72, 130, 255, 0.78);
   color: black;
   border: 2px solid #ccc; /* 添加边框 */
   border-radius: 5px; /* 可选：添加圆角 */
@@ -260,11 +283,14 @@ export default {
 }
 
 .menu-left {
+  font-family: '幼圆', STKaiti, sans-serif;
   font-weight: bold;
+  color: white;
 }
 
 .menu-right {
-  font-style: italic;
+  font-family: '幼圆', STKaiti, sans-serif;
+  color: white;
   position: relative; /* 添加相对定位 */
   cursor: pointer; /* 添加鼠标指针样式 */
 }
@@ -303,7 +329,7 @@ export default {
 
 .sidebar {
   width: 200px;
-  background-color: lightcyan;
+  background-color: rgba(113, 224, 246, 0.55);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -320,7 +346,10 @@ export default {
 }
 
 .sidebar-button {
-  background-color: #007bff;
+  background-color: #4e80ff;
+  font-family: '幼圆', STKaiti, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
   color: white;
   border: none;
   border-radius: 5px;
@@ -329,6 +358,7 @@ export default {
   cursor: pointer;
   width: 100%;
   text-align: center;
+  position: relative; /* 添加相对定位 */
 }
 
 .sidebar-button:hover {
@@ -336,7 +366,7 @@ export default {
 }
 
 .sidebar-button:disabled {
-  background-color: #ccc;
+  background-color: #9ea9b1;
   cursor: not-allowed;
 }
 
@@ -360,17 +390,13 @@ export default {
 }
 
 .submit-button {
-  background-color: #28a745;
+  background-color: rgba(81, 225, 36, 0.93);
   color: white;
   border: none;
   border-radius: 5px;
   padding: 10px;
   cursor: pointer;
   /* align-self: flex-start;  使提交按钮左对齐 */
-}
-
-.submit-button:hover {
-  background-color: #218838;
 }
 
 .main-content {
@@ -380,7 +406,7 @@ export default {
   align-items: center;
   justify-content: center; /* 使内容在容器内居中对齐 */
   padding: 20px;
-  background-color: #f085ff;
+  background-color: rgba(176, 234, 255, 0.44);
 }
 
 .video-container {
@@ -391,10 +417,24 @@ export default {
   align-items: center;
   border: 2px solid #ccc; /* 添加边框 */
   border-radius: 5px; /* 可选：添加圆角 */
-  background-color: white;
+  background-color: rgb(255, 255, 255); /* 修改背景颜色为不透明 */
 }
 
 .audio-player-container {
   margin-top: 20px;
+}
+
+.tooltip {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 105%;
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  z-index: 10;
+  font-size: 14px;
 }
 </style>

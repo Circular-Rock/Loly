@@ -1,7 +1,7 @@
 <template>
   <div class="login-container" :class="{'slide-right': isRegister}">
     <div class="image-box">
-      <img src="@/assets/loli.jpg" alt="Loli Image" class="loli-image"/>
+      <img src="@/assets/loli.png" alt="Loli Image" class="loli-image"/>
     </div>
     <div class="login-box" :class="{'slide-left': isRegister}">
       <h2 class="project-title">虚拟数字主播</h2>
