@@ -64,6 +64,7 @@ export default {
           this.serverMessageType = response.data.status === 'success' ? 'success' : 'error';
           if (response.data.status === 'success') {
             this.store.dispatch('setUsername', this.username); // 存储用户名到 Vuex store
+            sessionStorage.setItem('username', this.username);
             this.router.push('/ImageDisplay');
             console.log('Session ID:', response.data.session_id);  // 打印 sessionid
           }

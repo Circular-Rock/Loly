@@ -119,13 +119,14 @@ export default {
       largeVideoUrl: '',
       audioUrl: '', // 新增的 audioUrl 状态
       dvAnchorStarted: false,
-      showUserMenu: false // 新增状态变量用于控制下拉菜单的显示
+      showUserMenu: false, // 新增状态变量用于控制下拉菜单的显示
+      username: sessionStorage.getItem('username') || ''
     };
   },
   computed: {
-    username() {
+    /*username() {
       return this.store.state.username; // 从 Vuex store 获取用户名
-    },
+    },*/
     // 计算属性来动态设置按钮文本
     dvAnchorButtonText() {
       return this.dvAnchorStarted ? 'Close DV Anchor' : 'Start DV Anchor';
@@ -309,9 +310,10 @@ export default {
       this.$router.push('/profile'); // 假设个人信息页面的路由为 /profile
     },
     goToHomePage() {
-      this.$router.push('/ImageDisplay'); // 假设主页面的路由为 /
+      this.$router.push('/ImageDisplay');
     },
     goToLogin() {
+      sessionStorage.removeItem('username');
       this.$router.push('/UserLogin'); // 假设登录页面的路由为 /login
     },
     fetchText() {
@@ -354,20 +356,23 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #7fddff;
+  background-color: rgba(72, 130, 255, 0.78);
   color: black;
-  border: 2px solid white; /* 添加边框 */
+  border: 2px solid #ccc; /* 添加边框 */
   border-radius: 5px; /* 可选：添加圆角 */
   padding: 10px 20px;
   font-size: 18px;
 }
 
 .menu-left {
+  font-family: '幼圆', STKaiti, sans-serif;
   font-weight: bold;
+  color: white;
 }
 
 .menu-right {
-  font-style: italic;
+  font-family: '幼圆', STKaiti, sans-serif;
+  color: white;
   position: relative; /* 添加相对定位 */
   cursor: pointer; /* 添加鼠标指针样式 */
 }
@@ -411,7 +416,7 @@ export default {
   flex-direction: column;
   flex: 1;
   border-radius: 10px;
-  background-color: lightpink;
+  background-color: #b6b7ff;
 }
 
 .right-panel {
@@ -421,7 +426,7 @@ export default {
   flex-direction: column;
   flex: 1;
   border-radius: 10px;
-  background-color: lightblue;
+  background-color: #bdebff;
 }
 
 .right-panel-wrapper {
@@ -438,7 +443,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   flex: 1;
 }
 
@@ -497,7 +502,7 @@ textarea {
 }
 
 .audio-button button {
-  background-color: lightblue;
+  background-color: #99b7ff;
   color: white;
   border: none;
   border-radius: 5px;
@@ -506,7 +511,7 @@ textarea {
 }
 
 .audio-button button:active {
-  background-color: #0056b3;
+  background-color: #007aff;
   color: white;
 }
 
@@ -567,6 +572,7 @@ textarea {
   height: 80%;
   padding: 10px;
   box-sizing: border-box;
+  background-color: #ffffff;
 }
 
 .text-container textarea {
@@ -576,6 +582,7 @@ textarea {
   border-radius: 10px;
   padding: 10px;
   box-sizing: border-box;
+  background-color: #ffffff;
 }
 
 .inline-container {
@@ -610,6 +617,7 @@ textarea {
 }
 
 .upload-prompt {
+  font-family: '幼圆', STKaiti, sans-serif;
   font-size: 14px;
   color: #888;
   text-align: center;
@@ -665,6 +673,7 @@ textarea {
 }
 
 .text-display {
+  font-family: '幼圆', STKaiti, sans-serif;
   width: 97%;
   height: 98%;
   border: 1px solid #ccc;

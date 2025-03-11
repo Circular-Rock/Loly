@@ -7,8 +7,8 @@
         {{ username }}
         <div v-if="showUserMenu" class="dropdown-menu">
           <div class="dropdown-item" @click="goToProfile">个人信息</div>
-          <div class="dropdown-item" @click="goToHomePage">前往控制台</div>
-          <div class="dropdown-item" @click="goToLogin">登录界面</div>
+          <div class="dropdown-item" @click="goToHomePage">控制台</div>
+          <div class="dropdown-item" @click="goToLogin">退出登录</div>
         </div>
       </div>
     </div>
@@ -93,7 +93,8 @@ export default {
       liveStarted: false, // 添加状态变量
       showUserMenu: false,
       tooltipMessage: '', // 添加提示信息变量
-      tooltipMessageTwo: ''
+      tooltipMessageTwo: '',
+      username: sessionStorage.getItem('username') || ''
     };
   },
   setup() {
@@ -101,9 +102,9 @@ export default {
     return {store};
   },
   computed: {
-    username() {
+    /*username() {
       return this.store.state.username; // 从 Vuex store 获取用户名
-    },
+    },*/
   },
   methods: {
     handleClick(option) {
@@ -262,6 +263,7 @@ export default {
       this.$router.push('/Console1'); // 假设主页面的路由为 /
     },
     goToLogin() {
+      sessionStorage.removeItem('username');
       this.$router.push('/UserLogin'); // 假设登录页面的路由为 /login
     }
   }
@@ -299,6 +301,7 @@ export default {
   position: absolute; /* 绝对定位 */
   top: 100%; /* 菜单显示在用户名下方 */
   right: 0;
+  color: black;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 5px;

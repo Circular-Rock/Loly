@@ -31,6 +31,11 @@ import UserConsole1 from "../components/UserConsole1.vue";
        component: UserConsole1
      },
      {
+       path: '/console1',
+       name: 'UserConsole1',
+       component: UserConsole1
+     },
+     {
        path: '/:pathMatch(.*)*',
        name: 'NotFound',
        component: NotFound
