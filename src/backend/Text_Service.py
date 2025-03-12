@@ -12,3 +12,5 @@ text_list = [
 # 随机选择一个文本的函数
 def get_random_text():
     return random.choice(text_list)
+
+

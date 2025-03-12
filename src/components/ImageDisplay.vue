@@ -32,6 +32,11 @@
         <div class="video-container top large-video">
           <video id="video" class="video-display" autoplay :poster="require('@/assets/loli.png')"
                  style="width: 100%; height: 500px;"></video>
+          <div class="floating-danmu-display">{{ danmuText }}</div>
+          <div class="floating-danmu-buttons">
+            <button @click="readDanmu" class="floating-danmu-r-button">朗读弹幕</button>
+            <button @click="replyDanmu" class="floating-danmu-c-button">回复弹幕</button>
+          </div>
         </div>
         <div class="audio-player-container">
           <div class="audio-display">
@@ -94,7 +99,8 @@ export default {
       showUserMenu: false,
       tooltipMessage: '', // 添加提示信息变量
       tooltipMessageTwo: '',
-      username: sessionStorage.getItem('username') || ''
+      username: sessionStorage.getItem('username') || '',
+      danmuText: '这是一条弹幕', // 添加弹幕文本
     };
   },
   setup() {
@@ -440,4 +446,55 @@ export default {
   z-index: 10;
   font-size: 14px;
 }
+
+.floating-danmu-display {
+  position: absolute;
+  bottom: 150px; /* 调整位置 */
+  right: 100px; /* 调整位置 */
+  font-family: '幼圆', STKaiti, sans-serif;
+  border: 1px solid #008CBA;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10; /* 确保按钮在视频上方 */
+  width: 200px; /* 设置宽度与两个按钮对齐 */
+  background-color: rgba(255, 255, 255, 0.8); /* 设置背景颜色 */
+}
+
+.floating-danmu-buttons {
+  position: absolute;
+  bottom: 100px; /* 调整位置 */
+  right: 100px; /* 调整位置 */
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  z-index: 10; /* 确保按钮在视频上方 */
+}
+
+.floating-danmu-r-button {
+  font-family: '幼圆', STKaiti, sans-serif;
+  font-weight: bold;
+  color: white;
+  background-color: lightpink;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  margin-right: 10px;
+  width: 100px;
+}
+
+.floating-danmu-c-button {
+  font-family: '幼圆', STKaiti, sans-serif;
+  font-weight: bold;
+  color: white;
+  background-color: blue;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  width: 100px;
+  margin-left: 10px;
+}
+
 </style>
