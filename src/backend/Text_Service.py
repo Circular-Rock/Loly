@@ -13,4 +13,5 @@ text_list = [
 def get_random_text():
     return random.choice(text_list)
 
-
+def random_danmu_text():
+    return 'hahaha'

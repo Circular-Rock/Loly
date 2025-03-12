@@ -271,6 +271,9 @@ export default {
     goToLogin() {
       sessionStorage.removeItem('username');
       this.$router.push('/UserLogin'); // 假设登录页面的路由为 /login
+    },
+    getDanmu() {
+      return this.danmuText;
     }
   }
 };

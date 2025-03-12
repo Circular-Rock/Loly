@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 
-from src.backend.Text_Service import get_random_text
+from src.backend.Text_Service import get_random_text, random_danmu_text
 from src.backend.login_register_service import handle_register_request, handle_login_request
 from src.backend.redis_config import configure_redis_session  # 修改导入路径
 
@@ -22,6 +22,11 @@ def receive_text():
     text = data.get('text', '')
     print('Received text from frontend:', text)
     return jsonify({'status': 'success', 'received_text': text})
+
+@app.route('/get_danmu_text', methods=['GET'])
+def get_danmu_text():
+    text = random_danmu_text()
+    return jsonify({'text': text, 'status': 'success'})
 
 @app.route('/register', methods=['POST'])
 def register_user():
