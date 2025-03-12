@@ -23,11 +23,6 @@ def receive_text():
     print('Received text from frontend:', text)
     return jsonify({'status': 'success', 'received_text': text})
 
-@app.route('/get_danmu_text', methods=['GET'])
-def get_danmu_text():
-    text = random_danmu_text()
-    return jsonify({'text': text, 'status': 'success'})
-
 @app.route('/register', methods=['POST'])
 def register_user():
     return handle_register_request(request)
@@ -39,6 +34,11 @@ def login_user():
 @app.route('/get_text', methods=['GET'])
 def get_text():
     text = get_random_text()
+    return jsonify({'text': text, 'status': 'success'})
+
+@app.route('/danmu_text', methods=['GET'])
+def get_danmu_text():
+    text = random_danmu_text()
     return jsonify({'text': text, 'status': 'success'})
 
 if __name__ == '__main__':

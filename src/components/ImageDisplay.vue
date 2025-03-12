@@ -19,7 +19,9 @@
                   :disabled="option.disabled">
             {{ option.label }}
             <span v-if="option.label === '提交商品信息' && tooltipMessage" class="tooltip">{{ tooltipMessage }}</span>
-            <span v-if="option.label === '将文案发送到后端' && tooltipMessageTwo" class="tooltip">{{ tooltipMessageTwo }}</span>
+            <span v-if="option.label === '将文案发送到后端' && tooltipMessageTwo" class="tooltip">{{
+                tooltipMessageTwo
+              }}</span>
           </button>
           <button @click="toConsole" class="submit-button">控制台</button>
         </div>
@@ -35,7 +37,7 @@
           <div class="floating-danmu-display">{{ danmuText }}</div>
           <div class="floating-danmu-buttons">
             <button @click="readDanmu" class="floating-danmu-r-button">朗读弹幕</button>
-            <button @click="replyDanmu" class="floating-danmu-c-button">回复弹幕</button>
+            <button @click="getDanmu" class="floating-danmu-c-button">获取弹幕</button>
           </div>
         </div>
         <div class="audio-player-container">
@@ -50,7 +52,7 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
-import {sendmessage_URL} from '@/router/config.js';
+import {danmu_URL, sendmessage_URL} from '@/router/config.js';
 import {copywriting_generated_URL} from '@/router/config.js';
 import {offer_URL, start_URL, close_URL} from "@/router/config";
 import {useStore} from 'vuex'; // 引入 useStore
@@ -155,10 +157,10 @@ export default {
         this.tooltipMessageTwo = ''; // 清空提示信息
       }).catch((error) => {
         if (error.response && error.response.status === 500) {
-            this.tooltipMessageTwo = '请先启动数字人'; // 使用 tooltipMessageTwo 显示气泡信息
+          this.tooltipMessageTwo = '请先启动数字人'; // 使用 tooltipMessageTwo 显示气泡信息
         } else {
-            console.error('Error sending text to backend:', error);
-            this.tooltipMessageTwo = ''; // 清空提示信息
+          console.error('Error sending text to backend:', error);
+          this.tooltipMessageTwo = ''; // 清空提示信息
         }
       }); // 确保携带会话信息
       //this.inputText = '';
@@ -273,8 +275,30 @@ export default {
       this.$router.push('/UserLogin'); // 假设登录页面的路由为 /login
     },
     getDanmu() {
+      axios.get(danmu_URL)
+          .then((response) => {
+            console.log('Backend response:', response.data);
+            this.danmuText = response.data.text;
+          }).catch((error) => {
+        console.error('Error getting danmu:', error);
+      });
       return this.danmuText;
-    }
+    },
+    readDanmu() {
+      this.danmuText = this.getDanmu();
+      console.log('Sending: ' + this.danmuText);
+      axios.post(sendmessage_URL, {
+        text: this.danmuText,
+        type: 'echo',
+        interrupt: true,
+        sessionid: parseInt(this.sessionId),
+      }, {withCredentials: true}).then((response) => {
+        console.log('Backend response:', response.data);
+      }).catch((error) => {
+        console.error('Error sending text to backend:', error);
+      }); // 确保携带会话信息
+      //this.inputText = '';
+    },
   }
 };
 </script>
