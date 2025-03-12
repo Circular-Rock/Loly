@@ -55,7 +55,7 @@ export default {
       }
 
       // 发送登录信息到后端
-      axios.post('http://localhost:5000/login', {
+      axios.post('http://192.168.201.159:5000/login', {
         username: this.username,
         password: this.password
       }, { withCredentials: true }) // 确保携带会话信息
@@ -89,7 +89,7 @@ export default {
       this.emptyFields = false;
 
       // 发送注册信息到后端
-      axios.post('http://localhost:5000/register', {
+      axios.post('http://192.168.201.159:5000/register', {
         username: this.username,
         password: this.password
       }, { withCredentials: true }) // 确保携带会话信息

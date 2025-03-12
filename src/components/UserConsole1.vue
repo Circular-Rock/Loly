@@ -73,19 +73,14 @@
                 </div>
                 <div class="button-container">
                   <div class="button-wrapper">
-                    <button @click="start" :disabled="started">Start</button>
+                    <el-button @click="start" :disabled="started" type="primary">开启直播</el-button>
+                    <el-button @click="stop" :disabled="!started" type="danger">关闭直播</el-button>
+                    <el-button @click="sendMessage" type="success">发送文本</el-button>
                   </div>
                   <div class="button-wrapper">
-                    <button @click="stop" :disabled="!started">Stop</button>
-                  </div>
-                  <div class="button-wrapper">
-                    <button @click="toggleDVanchor">{{ dvAnchorButtonText }}</button>
-                  </div>
-                  <div class="button-wrapper">
-                    <button @click="sendMessage">sendMessage</button>
-                  </div>
-                  <div class="button-wrapper">
-                    <button @click="useAnchor">使用主播</button>
+                    <el-button @click="startDVanchor" :disabled="dvAnchorStarted" type="primary">启动主播</el-button>
+                    <el-button @click="closeDVanchor" :disabled="!dvAnchorStarted" type="danger">关闭主播</el-button>
+                    <el-button @click="useAnchor" type="info">使用主播</el-button>
                   </div>
                 </div>
               </div>
@@ -128,9 +123,8 @@ export default {
       return this.store.state.username; // 从 Vuex store 获取用户名
     },*/
     // 计算属性来动态设置按钮文本
-    dvAnchorButtonText() {
-      return this.dvAnchorStarted ? 'Close DV Anchor' : 'Start DV Anchor';
-    }
+    //   return this.dvAnchorStarted ? 'Close DV Anchor' : 'Start DV Anchor';
+    // }
   },
   methods: {
     negotiate() {
@@ -251,7 +245,7 @@ export default {
     handleAudioChange() {
       const file = event.target.files[0];
       if (file) {
-        const allowedExtensions = /(\.mp3)$/i;
+        const allowedExtensions = /(\.m4a)$/i;
         if (!allowedExtensions.exec(file.name)) {
           alert('请上传 mp3 格式的音频文件');
           this.$refs.audioFileInput.value = ''; // 清空文件输入
@@ -267,7 +261,7 @@ export default {
         }
       }).then(response => {
         if (response.status === 200) {
-          alert('上传成功，正在火速创造数字人中...');
+          alert('创造数字人成功...');
         }
         console.log('Upload success:', response.data);
       }).catch(error => {
@@ -293,13 +287,12 @@ export default {
         console.log('Close DV anchor');
       });
     },
-    toggleDVanchor() {
-      if (this.dvAnchorStarted) {
-        this.closeDVanchor();
-      } else {
-        this.startDVanchor();
-      }
-    },
+    //   if (this.dvAnchorStarted) {
+    //     this.closeDVanchor();
+    //   } else {
+    //     this.startDVanchor();
+    //   }
+    // },
     useAnchor() {
       this.$router.push('/ImageDisplay');
     },
@@ -317,7 +310,7 @@ export default {
       this.$router.push('/UserLogin'); // 假设登录页面的路由为 /login
     },
     fetchText() {
-      axios.get('http://localhost:5000/get_text')
+      axios.get('http://192.168.201.159:5000/get_text')
         .then(response => {
           this.textInput = response.data.text; // 假设返回的数据结构为 { text: '...' }
         })
@@ -605,6 +598,7 @@ textarea {
 
 .button-container {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   margin-top: 10px;
 }
@@ -613,7 +607,7 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 48%;
+  width: 100%;
 }
 
 .upload-prompt {
@@ -690,3 +684,4 @@ textarea {
   background-color: white;
 }
 </style>
+

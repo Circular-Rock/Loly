@@ -83,7 +83,8 @@
 </template>
 
 <script>
-import axios from 'axios'; // 引入 axios
+import axios from 'axios';
+import {offer_URL} from "@/router/config"; // 引入 axios
 
 export default {
   name: 'UserConsole',
@@ -125,7 +126,7 @@ export default {
         });
       }).then(() => {
         const offer = this.pc.localDescription;
-        return axios.post('http://10.10.24.171:5000/offer', {
+        return axios.post(offer_URL, {
           sdp: offer.sdp,
           type: offer.type,
         });

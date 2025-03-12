@@ -155,7 +155,7 @@ export default {
             this.tooltipMessageTwo = ''; // 清空提示信息
         }
       }); // 确保携带会话信息
-      this.inputText = '';
+      //this.inputText = '';
     },
     negotiate() {
       this.pc.addTransceiver('video', {direction: 'recvonly'});
