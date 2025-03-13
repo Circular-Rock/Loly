@@ -5,6 +5,8 @@ from src.backend.Text_Service import get_random_text, random_danmu_text
 from src.backend.login_register_service import handle_register_request, handle_login_request
 from src.backend.redis_config import configure_redis_session  # 修改导入路径
 
+from src.backend.config import ROOM_ID
+
 app = Flask(__name__)
 
 # 调用配置函数
@@ -38,7 +40,7 @@ def get_text():
 
 @app.route('/danmu_text', methods=['GET'])
 def get_danmu_text():
-    text = random_danmu_text()
+    text = random_danmu_text(ROOM_ID)
     return jsonify({'text': text, 'status': 'success'})
 
 if __name__ == '__main__':

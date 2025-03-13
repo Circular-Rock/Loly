@@ -285,6 +285,8 @@ export default {
       }).then(() => {
         this.dvAnchorStarted = false; // 更新状态变量
         console.log('Close DV anchor');
+      }).catch(error => {
+        console.error('Close DV anchor error:', error);
       });
     },
     //   if (this.dvAnchorStarted) {
@@ -320,7 +322,7 @@ export default {
     }
   },
   beforeUnmount() {
-    //this.closeDVanchor(); // 在组件卸载前调用 closeDVanchor 方法
+    this.closeDVanchor();
   },
   mounted() {
     window.onunload = () => {

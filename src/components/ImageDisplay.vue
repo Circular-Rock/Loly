@@ -34,10 +34,10 @@
         <div class="video-container top large-video">
           <video id="video" class="video-display" autoplay :poster="require('@/assets/loli.png')"
                  style="width: 100%; height: 500px;"></video>
-          <div class="floating-danmu-display">{{ danmuText }}</div>
+          <div class="floating-danmu-display" @click="getDanmu">{{ danmuText }}</div>
           <div class="floating-danmu-buttons">
             <button @click="readDanmu" class="floating-danmu-r-button">朗读弹幕</button>
-            <button @click="getDanmu" class="floating-danmu-c-button">获取弹幕</button>
+            <button @click="chatDanmu" class="floating-danmu-c-button">回复弹幕</button>
           </div>
         </div>
         <div class="audio-player-container">
@@ -52,7 +52,7 @@
 
 <script>
 import axios from 'axios'; // 引入 axios
-import {danmu_URL, sendmessage_URL} from '@/router/config.js';
+import {danmu_reply_URL, danmu_URL, sendmessage_URL} from '@/router/config.js';
 import {copywriting_generated_URL} from '@/router/config.js';
 import {offer_URL, start_URL, close_URL} from "@/router/config";
 import {useStore} from 'vuex'; // 引入 useStore
@@ -69,7 +69,7 @@ export default {
         {
           label: '将文案发送到后端', action: () => {
             this.sendMessage();
-          }, disabled: true
+          }, disabled: false
         },
         {
           label: '启动数字人', action: () => {
@@ -103,6 +103,7 @@ export default {
       tooltipMessageTwo: '',
       username: sessionStorage.getItem('username') || '',
       danmuText: '这是一条弹幕', // 添加弹幕文本
+      replyMessage: ''
     };
   },
   setup() {
@@ -259,6 +260,8 @@ export default {
         this.options[2].disabled = false; // 启用启动数字人按钮
         this.options[3].disabled = true; // 禁用关闭数字人按钮
         this.options[4].disabled = true; // 禁用开启直播按钮
+      }).catch(error => {
+        console.error('Close DV anchor error:', error);
       });
     },
     toggleUserMenu() {
@@ -299,6 +302,44 @@ export default {
       }); // 确保携带会话信息
       //this.inputText = '';
     },
+    chatDanmu() {
+      axios.post(danmu_reply_URL, {text: this.danmuText}, {withCredentials: true}) // 确保携带会话信息
+          .then(response => {
+            this.replyMessage = response.data.response_content
+            axios.post(sendmessage_URL, {
+              text: this.replyMessage,
+              type: 'echo',
+              interrupt: true,
+              sessionid: parseInt(this.sessionId),
+            }, {withCredentials: true}).then((response) => {
+              console.log('Backend response:', response.data);
+            }).catch((error) => {
+              if (error.response && error.response.status === 500) {
+                alert('请先启动数字人');
+              } else {
+                console.error('Error sending text to backend:', error);
+              }
+            });
+          }).catch(error => {
+        console.error('Error sending text to backend:', error);
+      });
+    },
+    chatDanmu1() {
+      axios.post(sendmessage_URL, {
+        text: this.replyMessage,
+        type: 'chat',
+        interrupt: true,
+        sessionid: parseInt(this.sessionId),
+      }, {withCredentials: true}).then((response) => {
+        console.log('Backend response:', response.data);
+      }).catch((error) => {
+        if (error.response && error.response.status === 500) {
+          alert('请先启动数字人');
+        } else {
+          console.error('Error sending text to backend:', error);
+        }
+      });
+    }
   }
 };
 </script>

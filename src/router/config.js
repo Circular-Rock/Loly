@@ -10,4 +10,6 @@ export const close_URL = 'http://192.168.201.242:5000/close';
 
 export const upload_URL = 'http://192.168.201.242:5000/upload';
 
-export const danmu_URL = 'http://localhost:5000/danmu_text';
+export const danmu_URL = 'http://192.168.201.159:5000/danmu_text';
+
+export const danmu_reply_URL = 'http://192.168.201.52:5000/generate_reply';
