@@ -326,7 +326,7 @@ export default {
     },
     chatDanmu1() {
       axios.post(sendmessage_URL, {
-        text: this.replyMessage,
+        text: this.danmuText,
         type: 'chat',
         interrupt: true,
         sessionid: parseInt(this.sessionId),
