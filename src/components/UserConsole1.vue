@@ -19,16 +19,18 @@
             <div class="container video-container top large-video"
                  @click="openFileInput('largeVideo')">
               <div class="video-display">
-                <video v-if="largeVideoUrl" :src="largeVideoUrl" controls class="video-display" autoplay></video>
-                <span v-else class="upload-prompt">请上传视频</span>
+                <video v-if="largeVideoUrl && isVideo(largeVideoFile)" :src="largeVideoUrl" controls class="video-display" autoplay></video>
+                <img v-else-if="largeVideoUrl && isImage(largeVideoFile)" :src="largeVideoUrl" alt="Uploaded Image" class="video-display" />
+                <span v-else class="upload-prompt">请上传视频或图片</span>
               </div>
-              <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="video/*"
+              <input type="file" ref="largeVideoFileInput" @change="handleVideoChange()" accept="image/*,video/*"
                      style="display: none;"/>
             </div>
             <div class="text-input-container">
               <div class="text-display" @click="fetchText" :class="{ 'text-clickable': !textInput }">
                 {{ textInput || '点击选择参考文本' }}
               </div>
+              <div class="upload-prompt-text">↑请朗读以上文本并上传对应音频↓</div> <!-- 新增提示文本 -->
             </div>
           </div>
           <div class="container audio-container">
@@ -43,7 +45,7 @@
               </div>
               <div class="audio-button-container">
                 <div class="audio-button">
-                  <button @click="submitVideoAndAudio">提交</button>
+                  <button @click="submitVideoAndAudio" :disabled="isSubmitting">提交</button>
                 </div>
               </div>
             </div>
@@ -115,7 +117,9 @@ export default {
       audioUrl: '', // 新增的 audioUrl 状态
       dvAnchorStarted: false,
       showUserMenu: false, // 新增状态变量用于控制下拉菜单的显示
-      username: sessionStorage.getItem('username') || ''
+      username: sessionStorage.getItem('username') || '',
+      largeVideoFile: null,
+      isSubmitting: false, // 新增状态变量用于控制提交按钮的禁用状态
     };
   },
   computed: {
@@ -199,6 +203,8 @@ export default {
       this.message = '';
     },
     submitVideoAndAudio() {
+      this.isSubmitting = true; // 提交前禁用按钮
+      console.log(this.isSubmitting);
       const formData = new FormData();
       formData.append('username', this.username);
       formData.append('text', this.textInput);
@@ -206,7 +212,11 @@ export default {
         fetch(this.largeVideoUrl)
             .then(r => r.blob())
             .then(videoBlob => {
-              formData.append('video', videoBlob, 'video.mp4');
+              if (this.isImage(this.largeVideoFile)) {
+                formData.append('video', videoBlob, 'video.jpg');
+              } else {
+                formData.append('video', videoBlob, 'video.mp4');
+              }
               if (this.audioUrl) {
                 fetch(this.audioUrl)
                     .then(r => r.blob())
@@ -233,19 +243,30 @@ export default {
     handleVideoChange() {
       const file = event.target.files[0];
       if (file) {
-        const allowedExtensions = /(\.mp4)$/i;
+        const allowedExtensions = /(\.mp4|\.jpg)$/i;
         if (!allowedExtensions.exec(file.name)) {
-          alert('请上传 mp4 格式的视频文件');
+          alert('请上传 mp4 格式的视频文件或 jpg 格式的图片文件');
           this.$refs.largeVideoFileInput.value = ''; // 清空文件输入
         } else {
           this.largeVideoUrl = URL.createObjectURL(file);
+          this.largeVideoFile = file; // 保存文件对象以便后续判断类型
         }
       }
+    },
+    isVideo(file) {
+      console.log(file);
+      console.log(file.type.startsWith('video/'));
+      return file && file.type.startsWith('video/');
+    },
+    isImage(file) {
+      console.log(file);
+      console.log(file.type.startsWith('image/'));
+      return file && file.type.startsWith('image/');
     },
     handleAudioChange() {
       const file = event.target.files[0];
       if (file) {
-        const allowedExtensions = /(\.m4a)$/i;
+        const allowedExtensions = /(\.mp3|\.wav|\.ogg|\.m4a)$/i;
         if (!allowedExtensions.exec(file.name)) {
           alert('请上传 mp3 格式的音频文件');
           this.$refs.audioFileInput.value = ''; // 清空文件输入
@@ -264,8 +285,10 @@ export default {
           alert('创造数字人成功...');
         }
         console.log('Upload success:', response.data);
+        this.isSubmitting = false; // 上传成功后启用按钮
       }).catch(error => {
         console.error('Upload error:', error);
+        this.isSubmitting = false; // 上传失败后启用按钮
       });
     },
     startDVanchor() {
@@ -313,12 +336,12 @@ export default {
     },
     fetchText() {
       axios.get('http://192.168.201.159:5000/get_text')
-        .then(response => {
-          this.textInput = response.data.text; // 假设返回的数据结构为 { text: '...' }
-        })
-        .catch(error => {
-          console.error('Error fetching text:', error);
-        });
+          .then(response => {
+            this.textInput = response.data.text; // 假设返回的数据结构为 { text: '...' }
+          })
+          .catch(error => {
+            console.error('Error fetching text:', error);
+          });
     }
   },
   beforeUnmount() {
@@ -376,6 +399,7 @@ export default {
   position: absolute; /* 绝对定位 */
   top: 100%; /* 菜单显示在用户名下方 */
   right: 0;
+  width: 100px;
   background-color: white;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -387,6 +411,7 @@ export default {
   padding: 10px 10px;
   cursor: pointer;
   font-size: 12px;
+  color: black;
 }
 
 .dropdown-item:hover {
@@ -614,9 +639,17 @@ textarea {
 
 .upload-prompt {
   font-family: '幼圆', STKaiti, sans-serif;
+  font-size: 24px;
+  color: #888;
+  text-align: center;
+}
+
+.upload-prompt-text {
+  font-family: '幼圆', STKaiti, sans-serif;
   font-size: 14px;
   color: #888;
   text-align: center;
+  margin: 10px;
 }
 
 .video-container {
@@ -643,6 +676,7 @@ textarea {
 .text-input-container {
   width: 50%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   border: 1px solid #ccc;
@@ -671,7 +705,8 @@ textarea {
 .text-display {
   font-family: '幼圆', STKaiti, sans-serif;
   width: 97%;
-  height: 98%;
+  height: 90%;
+  color: #888;
   border: 1px solid #ccc;
   border-radius: 5px;
   display: flex;

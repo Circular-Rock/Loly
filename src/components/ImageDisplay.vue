@@ -374,6 +374,7 @@ export default {
 .dropdown-menu {
   position: absolute; /* 绝对定位 */
   top: 100%; /* 菜单显示在用户名下方 */
+  width: 100px;
   right: 0;
   color: black;
   background-color: white;
