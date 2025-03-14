@@ -268,7 +268,7 @@ export default {
       if (file) {
         const allowedExtensions = /(\.mp3|\.wav|\.ogg|\.m4a)$/i;
         if (!allowedExtensions.exec(file.name)) {
-          alert('请上传 mp3 格式的音频文件');
+          alert('请上传 mp3\\wav\\ogg\\m4a 格式的音频文件');
           this.$refs.audioFileInput.value = ''; // 清空文件输入
         } else {
           this.audioUrl = URL.createObjectURL(file);

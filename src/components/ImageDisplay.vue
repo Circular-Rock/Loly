@@ -67,7 +67,7 @@ export default {
           }
         },
         {
-          label: '将文案发送到后端', action: () => {
+          label: '朗读文案', action: () => {
             this.sendMessage();
           }, disabled: false
         },
@@ -303,7 +303,7 @@ export default {
       //this.inputText = '';
     },
     chatDanmu() {
-      axios.post(danmu_reply_URL, {text: this.danmuText}, {withCredentials: true}) // 确保携带会话信息
+      axios.post(danmu_reply_URL, {text: this.danmuText, info: this.inputText}, {withCredentials: true}) // 确保携带会话信息
           .then(response => {
             this.replyMessage = response.data.response_content
             axios.post(sendmessage_URL, {
